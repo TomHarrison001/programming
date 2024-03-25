@@ -1,0 +1,19 @@
+Install postgreSQL
+
+start server:
+SQL Shell (psql)
+Server [localhost]: localhost
+Database [postgres]:
+Port [5432]:
+Username [postgres]:
+Password for user postgres: password
+
+shell commands:
+SELECT version();
+SELECT now();
+CREATE DATABASE dbName;
+CREATE TABLE colors (ColorID int, ColorName char(20) );
+INSERT INTO colors VALUES (1, 'red'), (2, 'blue'), (3, 'green');
+SELECT * FROM colors;
+\l   -- displays all databases
+\c dbName    -- connects to {dbName}

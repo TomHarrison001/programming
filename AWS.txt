@@ -1,0 +1,151 @@
+Set up MFA for AWS services
+
+AWS IAM (Identity and Access Management) user consists of a name and credentials
+IaaS (Infrastructure as a Service) - renting virtual infrastructure from a cloud provider and pay for only what you use
+Account > IAM User and Role Access to Billing Information > Edit > Activate IAM Access
+IAM > Access Management > Users > Add User
+# download csv after user created because only given the option once
+IAM > Access Management > User groups > Create Group (Attach permission policy for AdministratorAccess)
+Everything has a unique ARN (Amazon Resource Name)
+Billing > Billing Preferences > Receive PDF invoice, Receive Free Tier Usage Alerts
+
+Services:
+- Elastic Compute Cloud (EC2) - provides scalability
+- Simple Storage Service (S3) - provides storage
+- Route 53 - domain registration, DNS routing and health checking
+- Elastic File System (EFS) - NFS file system
+- Secrets Manager - retrieves credentials to remove the need to include them in source code.
+- CloudFront - accelerated content delivery for S3
+- Relational Database Service (RDS)
+- Simple Queue Service (SQS)
+- Simple Notification Service (SNS)
+- Kinesis
+- Elastic Container Service (ECS)
+- Elastic Kubernetes Service (EKS)
+- Fargate
+- Lambda - quick, serverloss commands
+- Step Functions
+- Cognito - consumer identity management
+- Machine learning services: Sage Maker, Sentiment, Lex, Personalize, Polly, Rekognition, Textract, Translate, Transcribe
+- CodePipeline, CodeCommit, CodeBuild, CodeDeploy
+- AWS OpsWorks, CloudFormation
+- CloudWatch
+- Web Application Firewall (WAF), Shield, GuardDuty, Inspector, Macie
+- CloudTrail, Security Hub
+
+Setup EC2:
+EC2 > Launch instance (create key pair)
+Instances > Checkbox > Connect
+sudo apt update
+sudo apt upgrade
+Instances > Checkbox > Instance state > Reboot instance
+sudo apt install apache2
+Instances > Checkbox > Networking (copy ipv4 and paste into new tab)
+# don't forge to stop/start the instance to reduce costs
+# Checkbox > Status checks (for status)
+
+# Create clone server in another availability zone
+Actions > Images and templates > Create image
+Images > AMIs (change availability zone)
+Launch Instance from AMI
+
+# Remove access from HTTP (hides from public traffic)
+Checkbox > Security groups > Checkbox > Actions > Copy to new security group
+Delete inbound HTTP > Create security group
+Instances > Checkbox > Actions > Security > Change security groups > Select new group > Remove previous group
+
+# Set elastic IP that remains after EC2 start/stop
+Search > VPC > Your VPCs > CIDRs
+EC2 > Elastic IPs > Allocate Elastic IPs
+Elastic IPs > Actions > Associate Elastic IP address
+
+# Using VPN to access
+System manager > Session manager > Set up session manager
+
+# Set up Load Balancer
+Load balancers > Select load balancer > Application load balancer > Select mappings of all availability zones used across all AMIs
+For security group: create new called 'alb-sg' with http for webservers, add inbound HTTP from anywhere and outbound http for previous security group.
+For target group: create new for instances on http and http1, set instances.
+Load balancers > Description > copy DNS name into browser
+
+# Set up Route 53
+Search > Route 53 > Hosted zone > Create hosted zone
+Change nameservers to AWS ones provided through domain provider
+Quick create record (no subdomain) > Route traffic to Alias to Application and Classic Load Balancer
+Quick create record (subdomain: www) > Route traffic to Alias to another record in this hosted zone
+
+# Create a VPC
+192.168.0.0/16
+# Create a subnet using the VPC
+192.168.1.0/24
+
+# Setup EFS 
+Search > EFS > Create file system
+# Create S3
+Search > S3 > Create bucket
+Select new bucket > Create folder > Select new folder > Upload (add any file)
+Install the AWS CLI
+command prompt:
+aws configure
+aws s3api list-buckets
+aws s3 ls
+aws s3 cp filename.png s3://bucketName/folderName/
+
+# Add file using SDK
+Select instance from insances > Connect > username: ubuntu
+# Install php
+sudo apt install php php-simplexml composer wget php-cli php-zip unzip
+composer require aws/aws-sdk-php
+nano s3test.php
+<?php
+
+require 'vendor/autoload.php';
+
+$s3 = new Aws\S3\S3Client([
+    'version' => 'latest',
+    'region' => 'REGIONHERE',
+    'credentials' => [
+        'key' => 'KEYHERE',
+        'secret' => 'KEYHERE'
+    ]
+]);
+
+$result = $s3->putObject([
+    'Bucket' => 'YOURBUCKET',
+    'Key' => 'testfromphp.txt',
+    'Body' => 'This is a test upload from PHP'
+]);
+
+echo "Uploading to S3...";
+var_dump($result);
+
+?>
+Ctrl + O
+Enter
+X
+php s3test.php
+# However this means putting your key and secret into source code which you shouldn't. To get around this:
+Create new IAM role > AWS service > EC2 > AmazonS3FullAccess
+EC2 > Instances > Actions > Security > Modify IAM role > Replace with new role
+# Now remove credentials from the php file and the IAM role will authorise itself when the php file runs
+
+# Another alternative for retrieving credentials
+Search > Secrets Manager > Store a secret
+
+# Different storage classes
+Select item in S3 storage > Storage class
+S3 > Lifecycle rule
+
+# Allow public access to S3 saved items
+S3 > Block public access > Unblock all public access
+S3 > Edit object ownership > ACLs enabled
+saved item > permissions > edit > allow read for everyone
+
+# Set up CloudFront
+Search > CloudFront > Create distribution
+copy distribution domain name to browser
+
+# Host web apps with Elastic Beanstalk and LightSail 
+
+Search > Cognito > Create user pool
+

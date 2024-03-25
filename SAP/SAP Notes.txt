@@ -1,0 +1,95 @@
+SAP Certification:
+- beginner level (record of achievement - complete all quizzes of a SAP Learning Journey)
+- intermediate level (associate, specialist)
+- advanced level (professional)
+
+Prepare for SAP certifications:
+- openSAP (open.sap.com)
+- SAP Learning Site (learning.sap.com)
+- SAP Learning Class
+- SAP Learning Hub
+- SAP Blended Learning Academy
+
+CER001 - SAP Certification Exam (1 Attempt - £173.00 + tax)
+CER006 - SAP Certification Exam (6 Attempts - £432.00 + tax)
+- Both include 12-month access to Certification Hub (you can take each exam up to a maximum of 3 times)
+
+Exams:
+- if your exam provider has chosen to use Questionmark Secure then you will need to install Questionmark Secure to take the exam
+- A browser with pop-up blocker disabled
+- A webcam + mic
+- 2+ Mbps download and upload internet speed
+- 2 forms of ID required (driver's license and passport)
+
+SAP Buisness Suite:
+- SAP01 - SAP Overview
+- S4H00 - SAP S/4HANA Overview
+- TS410 - Integrated Business Processes in SAP S/4HANA
+- SAPBI - Introduction to SAP BusinessObjects BI Solutions
+
+SAP Technology:
+- SAPTEC - Technology fundamentals for SAP S/4HANA and SAP Business Suite
+- HA100 - SAP HANA
+
+SAP Cloud Solutions
+SACE11 - Introduction to SAP Analytics Cloud
+
+Record of Experience badge:
+- 2 years of experience with projects that meet the following criteria:
+    - implementation of SAP solutions and SAP products covered by the SAP certifications
+    - successfully completed implementations, projects, sub-projects, project phases without associated ongoing customer escalations
+    - SAP certified consultants contributed substantially to the project implementation
+- During pilot phase, the following SAP certifications are considered:
+    - C_CPE - SAP Certified Development Associate - SAP BTP Extension Developer
+    - C_CPI - SAP Certified Development Associate - SAP Integration Suite
+- Clour ERP (Public Cloud):
+    - C_S4CPS - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition - Professional Services 
+    - C_S4CFI - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition - Finance 
+    - C_TS4C - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition implementation with SAP Activate 
+    - C_S4CAM - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition - Asset Management 
+    - C_S4CMA - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition - Manufacturing 
+    - C_S4CPR - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition - Sourcing and Procurement 
+    - C_S4CSC - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition - Supply Chain 
+    - C_S4CSV - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition – Service 
+    - C_S4CS - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition - Sales 
+    - C_S4CWM - SAP Certified Application Associate - SAP S/4HANA Cloud, public edition - Warehouse Management
+- You must stay certified to maintain the validity of the Record of Project Experience badge for a maximum of 5 years
+
+Stay certified by taking the latest exam for associate and specialist certifications (professional certifications will have a corresponding associate level) every 6-12 months
+
+Roles and Skils:
+https://help.sap.com/learning-journeys/learn-more
+
+Certifications:
+https://training.sap.com/certification/validity
+
+Courses:
+https://learning.sap.com/learning-journey/sap-integration-suite-managed-gateway-for-spend-management-and-sap-business-network-overview
+
+https://learning.sap.com/learning-journey/learn-the-basics-of-sap-bi
+
+https://learning.sap.com/learning-journey/Setting-Up-SAP-Build-Work-Zone-standard-edition-and-SAP-Mobile-Start-with-SAP-S-4HANA
+
+https://learning.sap.com/learning-journey/exploring-sap-analytics-cloud
+
+https://learning.sap.com/learning-journey/design-data-models-and-transform-data-in-sap-analytics-cloud
+
+https://learning.sap.com/learning-journey/developing-with-sap-integration-suite
+
+https://learning.sap.com/learning-journey/develop-a-custom-data-warehouse-on-sap-hana
+
+https://learning.sap.com/learning-journey/upgrading-your-sap-bw-skills-to-sap-bw-4hana
+
+https://learning.sap.com/learning-journey/develop-data-models-with-sap-hana-cloud
+
+https://learning.sap.com/learning-journey/learn-the-basics-of-sap-fiori
+
+https://learning.sap.com/learning-journey/explore-integrated-business-processes-in-sap-s-4hana-
+
+
+===================================================================================
+
+Questions:
+
+- Technology: Linux or Windows? Phone? PC Specs?
+- What associate, specialist and professional exams to undertake?

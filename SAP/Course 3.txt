@@ -1,0 +1,372 @@
+https://learning.sap.com/learning-journey/Setting-Up-SAP-Build-Work-Zone-standard-edition-and-SAP-Mobile-Start-with-SAP-S-4HANA
+
+Setting up SAP Mobile Start with SAP S/4HANA on SAP Build Work Zone
+
+SAP Line of Business (LoB) solutions - e.g. SAP S/4HANA Cloud, SAP Fieldglass
+SAP Build Zone, standard edition is a central entry point option for the business content from SAP LoB solutions
+SAP Mobile Start is the native entry point for SAP Build Zone, standard edition from mobile devices
+
+Use cases for a central entry point in the cloud, based on SAP Build Zone, standard edition:
+- Customer has a diverse landscape with multiple SAP LoB solutions
+- It is required to consume custom extensions and SAP standard business content in one place
+- Users need access to SAP apps from outside the core network
+- Users need to process tasks and notifications from multiple back-end solutions
+
+The business content from SAP LoB solutions can be federated or manually integrated into this service and made available on a launchpad site on SAP Business Technology Platform (BTP)
+
+SAP Mobile Start integrates:
+- Business content from the SAP LoB solution deployed on SAP Build Work Zone, standard edition
+- SAP S/4HANA workflow notifications
+- Tasks from SAP LoB solutions via integration with SAP Task Center
+- RSS feed-based news
+
+Integration with SAP S/4HANA uses Cloud Connector and SAP S/4HANA Cloud uses communication scenarios
+
+SAP Build Work Zone (standard | advanced) - common data model:
+- SAP BTP -> FLP Content -> Apps
+- SAP FES -> FLP Content -> Apps -> Business Suite Backend
+- SAP S/4HANA (on-premise/cloud) -> FLP Content -> Apps
+- SAP Cloud Solutions -> CDM Content -> Apps
+- Non-SAP -> CDM Content -> Apps
+
+Cloud Integration Automation service provides a guided workflow to integrate SAP cloud solutions to on-premise and other SAP cloud solutions
+It is an application on sAP BTP allowing you to create a workflow for pre-defined integration scenarios (e.g. integrating SAP Build Work Zone, standard edition with SAP S/4HANA)
+Free if the customer has an SAP BTP Cloud Foundry account in one of the Cloud Integration Automation service supported data centres or a system instance of licensed SAP products that are in scope of the integration scenarios covered in this service
+
+Enable Cloud Integration Automation Service in SAP BTP Subaccount:
+- Log in to your SAP BTP global account as administrator
+- Entitlements -> Entity Assignments -> Select the preferred subaccount
+- Configure Entitlements -> Add Service Plans -> Cloud Integration Automation Service standard (Application)
+- SAP BTP subaccount Services -> Service Marketplace
+- Cloud Integration Automation Services -> Create
+- View Subscription -> Instances and Subscriptions
+
+Access Cloud Integration Automation Service on SAP BTP Subaccount:
+- Log in to your SAP BTP global account as administrator
+- Access your subaccount -> Security -> Users -> Role Collections -> ...
+- CIASIntegrationAdministrator
+- Services -> Instances and Subscriptions
+
+Select and Start an Integration Scenario in Cloud Integration Automation Service:
+- Plan for Integration -> SAP Launchpad Service Integration -> Select Systems
+- My Inbox -> Disclaimer -> I Agree
+- Scenario Monitoring -> Status 'Completed'
+
+Download Cloud Connector (requires Java) from: https://tools.hana.ondemand.com/#cloud
+
+Initial Configuration for Subaccount:
+- visit https://<hostname>:8443 where hostname is of the machine in which the connector is installed
+- username: Administrator, password: manage, installation type: master
+- mandatory fields: region, subaccount, login e-mail, password (default: Password)
+
+EXPOSURE_SYSTEM_ALIASES_MODE - defines how to handle system aliases during content exposure
+Go to transaction /N/UI2/FLP_SYS_CONF and add an additional FLP config param. Click New Entries.
+
+FLP Property ID - EXPOSURE_SYSTEM_ALIASES_MODE, Category: Automatically filled, Type: Automatically filled, Property Value: CLEAR
+
+Clickjacking (UI redressing) Protection Activation using the Unified Connectivity (UCON) Framework:
+Go to transaction UCONCOCKPIT and select the HTTP Allowlist Scenario from the list.
+Then in the More menu, select HTTP Whitelist -> Setuo
+Select both options in the setup menu and save it
+In production, it is recommended to set the Mode to Active Check
+Add the host of your SAP Build Work Zone, standard edition: "<subdomain>.launchpad.cfapps.eu10.hana.ondemand.com"
+
+Exposure Service Check:
+Check if the service /sap/bc/ui2/cdm3 is activated in the SAP S/4HANA system
+Go to transaction SICF and find cdm3
+Double click list entry, set active, tick Logon Data > Use All Logon Procedures
+
+Preparation of Exposing User:
+Make sure the user requires access to the "/sap/bc/ui2/cdm3/entities" endpoint (e.g. assigned to SAP_FLP_ADMIN role or go to Parameters > /UI2/PAGE_CACHE_OFF and remove)
+
+Content Exposure:
+Go to transaction /N/UI2/CMD3_EXP_SCOPE
+Click multiple selection icon
+Select business roles to expose (e.g. SAP_BR_Purchaser), Save Selected Roles and Expose
+
+Creation of SAP BTP Destinations:
+- 2 destinations need to be created in the SAP Business Technology Platform subaccount to connect to the SAP S/4HANA system:
+  - Design-time destination, used by SAP Build Work Zone, standard edition to fetch the exposed content fom the SAP S/4HANA system
+  - Runtime destination, used during runtime to access backend data
+Log on to SAP BTP subaccount > Destinations > New Destination
+Design-time configuration:
+	- Type: HTTP
+	- Description: S4 Design Time Destination
+	- URL: https://<hostname>:<port>/sap/bc/ui2/cdm3/entities
+	- Proxy Type: OnPremise
+	- Authentication: BasicAuthentication
+	- Location ID: <Location ID defined in Cloud Connector>
+	- User: SAP S/4HANA User
+	- sap-client: <SAP S/4HANA client> For example, 100
+Runtime configuration:
+	- Type: HTTP
+	- Description: S4H Runtime Destination
+	- Proxy Type: OnPremise
+	- URL: https://<hostname>:<port>
+	- Authentication: BasicAuthentication
+	- Location ID: <Location ID defined in Cloud Connector>
+	- User: SAP S/4HANA user
+	- HTML5.DynamicDestination: true
+	- MobileEnabled: true
+	- sap-client: <client> for example, 100
+	- sap-platform: ABAP
+	- sap-service: 32<service number> for example 3200
+	- sap-sysid: <sysID> for example, S4H
+
+Add Entitlement to SAP BTP Subaccount:
+- entitlements > entity Assignments
+- select subaccount > configure entitlements 
+- search for SAP Build Work Zone
+
+Create SAP Build Work Zone, standard edition Subscription on SAP BTP Subaccount:
+- services > service marketplace
+- search for SAP Build Work Zone
+
+Access SAP Build Work Zone, standard edition:
+- security > Users
+- role collection > ... > assign role collection
+- select Launchpad_Admin > assign role collection
+- services > instances and subscriptions > SAP Build Work Zone, standard edition
+
+Cloud Connector Certificates: System, CA, User
+
+Syncing Cloud Trust with IdP:
+- Cloud To On-Premise > Principal Propagation > Sync (refresh circle)
+- Edit Mapping Virtual To Internal Systems (HTTPS Protocol) > Principle Type: X.509 Certificate
+- Connectivity > Destinations > Destination Configuration: BasicAuthentication -> PrincipalPropagation
+
+Setup Backend for Principal Propagation:
+Go to transaction STRUST > edit mode > SSL Server Standard (Right click and create new if one doesn't already exist) > Import Certification > Add to certificate list
+Go to transaction CERTRULE > import certificate > .der > change mode > + rule > Login As: email
+Go to RZ10 > Select default, extend maintenance and change > Add parameter > SUBJECT="CN=<>",ISSUER="CN=<>"
+e.g. SUBJECT="CN=thisismycchost.mycompany.com, L=WDF, O=SAP, C=DE", ISSUER="CN=thisismycchost.mycompany.com, L=WDF, O=SAP, C=DE"
+Copy the value of the subject and issuer from the Cloud Connector system certificate in the transaction STRUST
+icm/HTTPS/verify_client = 1
+login/certificate_mapping_rulebased = 1
+Go to transaction SMICM -> Administration -> ICM -> Exit soft -> Global -> Restart: Yes
+
+Create Communication System to establish connectivity with SAP Build Zone, standard edition:
+Log on to the SAP Fiori launchpad with the SAP S/4HANA Cloud admin user
+Open the Communication Systems app > New > System ID: LPD_EXPOSURE_COM_0647_SYS > Enter hostname (subdomain of subaccount.launchpad.cfapps.region.hana.ondemand.com)
+Users for Inbound Communication > Add + > Authentication Method: SSL Client Certificate > New User > Username: LPD_EXPOSURE_COM_0647_USER > Upload public key corresponding to the SSL Client Certificate
+Users for Outbound Communication > Add + > Authentication Method: none
+
+Export Trust Certificate of the Subaccount:
+Log on to subaccount using the SAP BTP platform admin user
+Connectivity > Destinations > Download Trust (required by the Communication System in next step)
+
+Create a Communication System for Consuming the Content:
+Log on to the SAP Fiori launchpad with the SAP S/4HANA Cloud admin user
+Open the Communication Systems app > New > System ID: LPD_CONSUME_SYS > Technical Data > General > Inbound Only: true > Identity Provider > SAML Bearer Assertion Provider > Upload Signing Certificate (Upload Trust downloaded in previous task) > SAML Bearer Issuer: cfapps.<region>.hana.ondemand.com/<subaccount ID>
+
+Expose SAP S/4HANA Cloud Business Content:
+Administration > Communication Arrangements > New > Search Scenario: SAP_COM_0647 > Create > Arrangement Name: SAP_COM_0647_EXPOSURE
+Search All: Maintain Protection Allowlists > Add + > HTTPS 443 > Search All: Maintain Business Roles > SAP_BR_PURCHASER > Expose to SAP BTP
+
+Setup Trust from Identity Authentication to Subaccount:
+Log in to the SAP BTP subaccount with the platform admin user
+Export SAML metadata of the subaccount
+Log in to Identity Authentication with the admin user
+Create a new application for the subaccount in the Identity Authentication admin console (type: SAP BTP solution)
+Define a SAML 2.0 configuration from the downloaded SAML metadata
+Set the Subject Name Identifier and Default Name ID Format
+
+Setup Trust from Subaccount to Identity Authentication:
+Log in to Identity Authentication with the admin user
+Export the SAML metadata of Identity Authentication
+Log in to the BTP subaccount with the platform admin user
+New Trust Configuration > Upload the SAML metadata to add Identity Authentication to the trust configuration of the subaccount
+Configure it for user login
+
+Access SAP Build Work Zone, standard edition with an Identity Authentication User:
+Assign launchpad admin role to Identity Authentication user
+Access Site Manager with Identity Authentication user
+Security > User > Create > Assign Role Collection > Launchpad_Admin > Assign Role Collection
+Services > Instances and Subscriptions > SAP Build Work Zone, standard edition > IAS for SAP Mobile Start
+
+Configure Destinations for Fetching and Consuming Business Content:
+In the SAP BTP cockpit, log on to your subaccount with the SAP BTP platform admin user
+Navigation > Connectivity > Destinations > New Destination:
+  - Name: <system ID><client>dt
+	- Type: HTTP
+	- Description: <system ID>_<client> design-time connection
+	- URL: https://<SAP S/4HANA Cloud tenant ID>-api.s4hana.ondemand.com/sap/bc/http/sap/aps_flp_content_exposure/entities
+	- Proxy Type: Internet
+	- Authentication: ClientCertificateAuthentication
+	- Use client-provided certificate: Keep unchecked
+	- Key Store Location: Key store that stores the relevant keys (PFX format)
+	- HTML5.DynamicDestination: true
+	- Use default JDK truststore: checked
+Navigation > Connectivity > Destinations > New Destination:
+  - Name: <system ID><client>rt_tiles
+	- Type: HTTP
+	- Description: <system ID>_<client> runtime for dynamic tiles
+	- URL: https://<SAP S/4HANA Cloud tenant ID>-api.s4hana.ondemand.com
+	- Proxy Type: Internet
+	- Authentication: SAMLAssertion
+	- Audience: https://<SAP S/4HANA Cloud tenant ID>.s4hana.ondemand.com
+	- AuthnContextClassRef: urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession
+	- nameIdFormat: urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+	- HTML5.DynamicDestination: true
+Navigation > Connectivity > Destinations > New Destination:
+  - Name: <system ID><client>rt_apps
+	- Type: HTTP
+	- Description: <system ID>_<client> runtime apps
+	- URL: https://<SAP S/4HANA Cloud tenant ID>-api.s4hana.ondemand.com
+	- Proxy Type: Internet
+	- Authentication: NoAuthentication
+	- HTML5.DynamicDestination: true
+	- sap-platform: ABAP
+
+Import Business Content to SAP Build Work Zone, standard edition:
+Create content channel
+Manage content
+Create site and assign roles
+Assign role collections to users
+Test the site
+
+Onboarding via QR Code:
+Access your site in SAP Build Work Zone, standard edition
+Choose the user icon (top right) > Settings > SAP Mobile Start Application
+If it doesn't work, Site Manager > SAP Modile Start flag: true
+
+Onboarding via MDM Using Managed App Configuration:
+Requires SAP Mobile Services Host, Site URL and Site ID
+SAP Build Work Zone URL: https://<tenant-subdomain>.launchpad.cfapps.<region>.hana.ondemand.com/site?siteId=<site-id>
+* Site URL (same as the SAP Build Work Zone URL): https://<tenant-subdomain>.launchpad.cfapps.<region>.hana.ondemand.com/site?siteId=<site-id>
+SAP Build Work Zone Host: <tenant-subdomain>.launchpad.cfapps.<region>.hana.ondemand.com
+* SAP Mobile Services Host (SAP Build Work Zone Host with .m): <tenant-subdomain>.m.launchpad.cfapps.<region>.hana.ondemand.com
+SAP Build Work Zone Site ID: <site-id>
+* Site ID (same as the SAP Build Work Zone Site ID): <site-id>
+
+Access SAP Mobile Services for SAP Mobile Start:
+Create the MobileTenantAdmin role collection (add the MobileAdmin role to this collection)
+Assign MobileTenantAdmin to user
+Construct URL of the SAP Mobile Services Admin Cockpit (structure: https://<tenant-subdomain>.m.launchpad.cfapps.<region>.hana.ondemand.com/mobileservices/admin)
+
+Adjusting Passcode Policy Settings:
+Access SAP Mobile Services (explained in previous step)
+Mobile Settings Exchange > Client Configuraiton > Passcode Policy
+
+Configuring Feature Flags:
+SAP Mobile Services > Mobile Settings Exchange > Client Configuration
+GlobalWidgets - access to the Business Info Widget and the News Widget
+SAPMobileStartBrowserIOS - new in-app browser
+ShareAndExternalBrowser - able to share and open links in external browsers
+Smartwatch - enable the use of the watch app
+
+Create a New Role and Group for Mobile Content:
+Access the Site Manager provided by SAP Build Work Zone, standard edition
+Content Manager > New Role +
+Site Directory > Settings > Assignments (add new role)
+Access the subaccount in SAP BTP cockpit with platform user
+Assign new role collection to user
+Site Manager > Content Manager > New Group
+
+Create Tiles for Native Apps:
+Site Manager > Content Manager > New Application +
+Enter Title, Description, System: No System, APP UI Technology: Native iOS or Native Android
+Enter URL to Launch App (e.g. concurmobile://) and URL to Install App (e.g. https://apps.apple.com/de/app/sap-concur/id335023774)
+Navigation > Enter Semantic Object and Action
+Visualization > Enter Subtitle, Information and icon
+Add to Role
+
+Create Tiles for News Feeds:
+Site Manager > Content Manager > New Application +
+Enter Title, Description, System: No System, App UI Technology: URL (set url to news feed, e.g. https://news.sap.com)
+Navigation > Enter Semantic Object and Action
+Visualization > Enter Subtitle, Information and Icon > Add parameters mobilestart.type: news and mobilestart.feedUrl: Url pointing to RSS 2.0 feed (e.g. https://news.sap.com/feed/)
+Add to Role
+
+Apply a Theme:
+Create and export a custom theme from SAP Theme Designer
+Import custom theme to SAP Mobile Services: Mobile Settings Exchange > Client Configuration > Appearance
+
+Notifications on SAP S/4HANA or SAP S/4HANA Cloud can be broadcasted to the Notification Service (a kernal) and then made available via:
+- SAP BTP notifications
+- In-app notifications
+- Native notifications
+
+Prepare SAP Build Work Zone, standard edition for Notifications:
+Enable notifications for specific site (Site Manager > Site Settings > Edit > Show Notifications: Yes)
+Generate credentials for notifications and choose authentication identifier (Site Manager > Settings > Notifications > Authentication Identifier > Generate)
+
+Add parameters to SAP BTP destinations:
+Access SAP BTP cockpit > Connectivity > Destinations
+Select entry for runtime destination of your SAP S/4HANA system > Edit > New Property
+NOTIF_SERVICEPATH: /sap/opu/odata4/iwngw/notification/default/iwngw/notification_srv/0001
+
+Create RFC Destination:
+Log in to SAP S/4HANA with an admin user
+Open transaction SM59, create a new RFC destination
+Provide a name for the Destination (e.g. the name of subaccount) and select the Connection Type G (HTTP connection to external server)
+Provide a description
+Technical Settings > Provide the Host from the notification credentials obtained from the Site Manager and add "/v2" as Path Prefix
+Logon & Security > Status of Secure Protocol > SSL: Active
+Special Options > HTTP Setting: HTTP 1.1
+
+Export Trusted Root Certificate of the Subaccount Token Endpoint:
+Open in browser (cancel authentication popup): <subdomain>.authentication.<region>.hana.ondemand.com/oauth/token
+Open browser's development tools > Security > View Certificate > Details > Choose Top on Certificate Hierarchy and Export (save as .der or base64 encoded)
+
+Import Trusted Root Certificate to SAP S/4HANA:
+Log in to SAP S/4HANA as an admin and open transaction STRUST
+SSL client SSL Client (Anonymous) > Certificate > Import Certificate > Add to Certificate List (in change mode)
+
+Create the OAuth 2.0 Client Profile in SAP S/4HANA:
+Log in to SAP S/4HANA as an admin and open transaction SE80
+Local Objects (dropdown) > enter username and choose Display
+Right-click root node > Create > More/Other > OAuth 2.0 Client Profile
+Enter a name, Type: DEFAULT, Continue
+Local Object to create (it is added to the Object List)
+Make sure Scopes tab is empty and Administration > No authorization check: checked
+
+Configure the OAuth 2.0 Client Profile in SAP S/4HANA:
+Log in to SAP S/4HANA and open the transaction OA2C_CONFIG
+Create
+OAuth 2.0 Client Profile: Select the client profile previously created
+Configuration Name: Should prefill with the same name
+OAuth 2.0 Client ID: Enter the value from the notification credentials from the Site Manager
+Details > General Settings > Enter details from Site Manager: Client Secret, Authorization Endpoint, Token Endpoint
+Access Settings > Client Authentication: Basic, Resource Access Authentication: Header Field, Selected Grant Type: Client Credentials
+
+Register and Activate Cloud Notification Channel:
+Log in to SAP S/4HANA and open the transaction SPRO
+SAP Reference IMG > SAP Netweaver/ABAP Platform > Notification Channel > Notification Channel Hub > Configuration > Connection Settings > Register Destination and OAuth Profile for SAP Cloud Notification Service
+Enter details and execute
+SAP Reference IMG > SAP Netweaver/ABAP Platform > Notification Channel > Notification Channel Hub > Administration > Push Channel Settings > Activate and Maintain Push Channels
+Choose New Entries to create a new entry with push channel id: SAP_CLOUD, Is Active: checked
+
+Configure bgRFC Queue:
+SAP Reference IMG > SAP Netweaver/ABAP Platform > Notification Channel > Notification Channel Hub > Configuration > Connection Settings > Register bgRFC Destination for Cloud Service
+Define Inbound Dest. > Create New Destination named IWNGW_NOTIF_CLOUD_BGRFC with queue prefix: NGW_
+
+Enable and Configure Sensitive Data Cache on the Hub:
+SAP Reference IMG > SAP Netweaver/ABAP Platform > Notification Channel > Notification Channel Hub > Administration > General Settings > Register Notification Store in SFF
+New Entries > Notification Channel Secure Store Encryption
+SAP Reference IMG > SAP Netweaver/ABAP Platform > Notification Channel > Notification Channel Hub > Administration > General Settings > Maintain Notification Store in SFF Settings
+SFF Notification Channel Secure Store Encryption > (if red cross) Right-click > Create
+SAP Reference IMG > SAP Netweaver/ABAP Platform > Notification Channel > Notification Channel Hub > Administration > General Settings > Enable Sensitive Data Cache on the Hub
+Enable Sensitive Data Cache: checked
+
+Testing:
+Transaction /n/IWNGW/BEP_DEMO > Provider ID: /IWNGW/DEMO_EXT, Check if provider is active: checked (if not active use /IWNGW/DEMO)
+Transaction SWU3 > Start Verification Workflow
+
+Troubleshoot (check notifications are showing up in this order):
+On the SAP Fiori launchpad on SAP S/4HANA
+On the site created using SAP Build Work Zone, standard edition
+SAP Mobile Start app screens (e.g. Notification Center or Start Screen)
+As a native notification on your device home screen
+
+Complete Setup for SAP S/4HANA Cloud:
+Log on to the SAP Fiori launchpad on SAP S/4HANA Cloud as admin user
+Communication Arrangements app > New > Enter Scenario SAP_COM_0683 > Create
+Communication Arrangement > New > Create
+Technical Data > General section > Host Name: Host from Site Manager
+Technical Data > OAuth 2.0 Settings > provide Auth. Endpoint and Token Endpoint from Site Manager
+Users for Outbound Communication > New + > Authentication Method: OAuth 2.0, Enter OAuth 2.0 Client ID and Client Secret from Site Manager
+
+Mapping Role Collections Between SAP BTP and IdP:
+Group > Applications & Resources > Bundled Applications > SAP BTP Subaccount > Assertion Attributes > Add > User Attribute: Groups, Assertion Attribute: Groups
+Settings of Connected Identity Authentication Service > Security > Trust Configuration > Connected Identity Authentication > Role Collection Mappings > New > Attribute: Groups

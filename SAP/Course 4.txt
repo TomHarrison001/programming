@@ -1,0 +1,115 @@
+https://learning.sap.com/learning-journey/exploring-sap-analytics-cloud
+
+Exploring SAP Analytics Cloud
+
+Log in to your SAP Analytics Cloud (SAC) tenant to reach the Home screen
+
+To promote content across multiple SAP Analytics Cloud tenants, administrators transfer over the cloud using the Content Network
+Each system can store 300MB of exported content for free in the My Content area
+The Content Network is also where Business Content is stored
+
+Security area - hosts standard monitoring reports and history of all activities
+
+Access Levels: 
+- View (Read, Copy, View Comment, Add Comment)
+- Edit (Update, Create files, Create folders)
+- Full Control (Delete, Delete Comment, Share)
+- Custom
+
+Model:
+  - business data, the basis for stories and analytic application
+Conncetion:
+  - SAP Analytics Cloud to a specific data source
+Story:
+  - explore data interactively
+Canvas Page:
+  - Blank canvas, story elements (widgets) can be added, fixed width/height
+Responsive Page:
+  - Story page adjusting width/height based on device
+Grid:
+  - A table-only page that is available in the Classic Design Experience but not the Optimized Design Experience
+Data Analyzer:
+  - application for Live SAP BW queries, Live SAP HANA views, SAP Datasphere models and SAP Analytics Cloud models
+Digital Boardroom:
+  - explore live data and visualise actions using value-driver trees
+
+Connections:
+- Live:
+  - can only access SAP data sources/systems
+  - data stored on source system
+  - data accessed on SAP Analytics Cloud
+  - Support connections: SAP BPC, SAP BW (and BW/4HANA), SAP Datasphere, SAP HANA (and HANA Cloud), SAP S/4HANA (and S/4HANA Cloud), SAP Universe or Webl document
+- Import:
+  - can access even non-SAP data sources/systems (e.g. Google Drive, SQL databases, OData Services)
+  - data copied and stored on the SAP Analytics Cloud
+  - can even use non-SAP support connections
+
+Dimensions:
+- represent qualitative data
+Measures:
+- represent quantitative data
+Model:
+- consists of dimensions and measures, representing a subset of data
+- primary sources for SAP Analytics Cloud stories
+- Styles:
+  - Analytic model: read-only
+  - Planning model: read/write
+- Type:
+  - Live (uses live connection): you cannot manipulate or write data because it's not contained in the SAP Analytics Cloud
+  - Import (uses import connection): changes in the original data source aren't reflected in the model
+
+The Modeler - Create models from a connection, Excel/CSV file or a blank model
+
+Datasets:
+- a simple collection of data presented in a tabular format
+
+- Embedded (private): 
+  - unique to a story
+  - can't be shared outside the story
+  
+  - CAN be converted to a model
+  - option to change the data source
+- Standalone (public):
+  - can be shared among different stories
+  - CAN'T be converted to a model
+  - CAN'T change the data source
+
+Exclusive Features for the Classic Design Experience:
+  - Explorer (replaced by the Data Analyzer)
+  - Grid Pages (replaced by Optimized Presentation)
+  - Old HANA and BW Versions
+
+Data Visualisation:
+- Choose direction
+- Keep it simple
+- Follow general reading direction
+- Group information logically
+
+SAP Add-Ins to Microsoft Office:
+- The SAP Analytics Cloud, Add-In for Microsoft Office
+- SAP Analysis for Microsoft Office (can use live models)
+
+Stories can also be customised using scripting (in a subset of javascript)
+
+Planning Features:
+- Data Entry: enter absolute or relative (e.g. *2, +500) data into cells
+- Version Management: use history to see what's happened, roll back to a previous state
+- Data Locking: lock sections of data when you're getting ready to close your books
+- Data Actions: model complex processes using a visual editor or a scripting engine
+- Validation Rules: prevent improper data entry
+- Value Driver Trees: turn a driver-based planning model into a streamlined visualisation
+- Structured Allocations: establish reusable steps for allocating costs
+
+SAP Analytics Cloud Augmented Analytics Functionality:
+- Predictive Forecast: project out time frames based on historical data
+- Search to Insight: request information in natural language by typing a question abou the data
+- Smart Insight: adds context to a chart element or data point in a table
+- Smart Predict: create predictive models that learn from historical data and find patterns of behaviour to generate predictions
+
+Search to Insight for live data not supported for live connections to SAP HANA Cloud or SAP Datasphere
+Smart Insight for live data only supported for SAP HANA on-premise
+Smart Predict on acquired data not supported for analytic models (only datasets and planning models)
+Smart Predict on live data is only supported for SAP HANA on-premise 
+
+Collaborate with discussions and comments
+Calendar allows you to: collaborate, set/track status, assign reviewers, add reminders and view due dates

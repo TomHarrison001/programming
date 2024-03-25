@@ -1,0 +1,20 @@
+* {
+  width: 100%;
+  height: 100%;
+}
+.button {
+  color: #083ea3;
+  border: 1px solid #083ea3;
+  border-radius: 5px;
+  font-size: 56px;
+  cursor: pointer;
+}
+.X {
+  background-color: #083ea3;
+  color: #ff8514;
+}
+
+.O {
+  background-color: #ff8514;
+  color: #083ea3;
+}

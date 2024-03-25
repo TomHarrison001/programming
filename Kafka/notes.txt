@@ -1,0 +1,65 @@
+Publisher -- Message Queue --> Subscriber
+
+Apache Kafka:
+- Open source
+- One of the most popular messaging platforms
+- Producers/publishers push messages to Kafka
+- Consumers/subscribers listen and receive messages
+
+Kafka Messages:
+- Key (not always unique, used for partitioning)
+- Value (user defined - event/data)
+- Timestamp
+
+e.g.
+Key=1001
+Value={
+    "id": 1001,
+    "name": "Tom"
+}
+
+Topics:
+- Holder of messages (files with papers, a db table with records)
+- Queues for similar messages
+- Multiple topics per kafka instance and multiple partitions per topic
+- Can have 1-n partitions
+
+Brokers:
+- running kafka instance
+- listens on specific port
+- manages topics, partitions and logs (files storing data)
+
+docker-compose -f kafka-single-node.yml up -d        # create and start kafka container
+docker ps                                            # check docker containers
+docker-compose -f kafka-single-node.yml down         # shutdown and remove kafka container
+docker exec -it kafka-broker /bin/bash               # login to kafka container
+cd /opt/bitnami/kafka/bin                            # navigate to kafka scripts dir.
+
+# create new topic called kafka.learning.tweets
+
+./kafka-topics.sh \
+    --bootstrap-server localhost:29092 \
+    --create \
+    --topic kafka.learning.tweets \
+    --partitions 2 \
+    --replication-factor 1
+
+./kafka-topics.sh --bootstrap-server localhost:29092 --list                       # list all topics
+./kafka-topics.sh --bootstrap-server localhost:29092 --describe                   # details for all topics
+./kafka-console-producer.sh --bootstrap-server localhost:29092 \                  # push messages (asks for messages after)
+            --topic kafka.learning.tweets
+./kafka-console-consumer.sh --bootstrap-server localhost:29092 \                  # consume messages from topic
+            --topic kafka.learning.tweets --from-beginning
+./kafka-topics.sh --bootstrap-server localhost:29092 \                            # delete topic
+            --delete --topic kafka.learning.alerts
+./kafka-topics.sh --bootstrap-server localhost:29092 \                            # check topic partitioning
+            --topic kafka.learning.tweets --describe
+./kafka-console-producer.sh --bootstrap-server localhost:29092 \                  # push message to topics with keys
+            --property "parse.key=true" --property "key.separator=:" \
+            --topic kafka.learning.tweets
+./kafka-console-consumer.sh --bootstrap-server localhost:29092 \                  # consume messages using consumer group
+            --topic kafka.learning.tweets --group test-consumer-group \
+            --property print.key=true --property key.separator=" = " \
+            --from-beginning
+./kafka-consumer-groups.sh --bootstrap-server localhost:29092 \                   # check current status of offsets
+            --describe --all-groups

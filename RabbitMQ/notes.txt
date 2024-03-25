@@ -1,0 +1,12 @@
+message fram:
+type (method, header, body), channel, siize, payload and frame-end
+
+exchanges: direct, fanout, topic, headers
+
+download rabbitMQ and erlang
+rabbitmq-plugins enable rabbitmw_management
+https://localhost:15672
+username: guest
+password: guest
+
+NuGet: RabbitMQ.Client

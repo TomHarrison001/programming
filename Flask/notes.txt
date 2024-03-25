@@ -1,0 +1,39 @@
+requires flask and pipenv packages
+
+create project:
+new file -> "app.py" / "main.py"
+
+run project:
+python app.py / main.py
+-------------- or --------------
+$env:FLASK_APP = "{projectName}"
+flask run
+
+set development mode:
+$env:FLASK_ENV = "development"
+
+create venv:
+'pipenv shell'
+flask run
+
+run tests:
+pytest
+
+run on server:
+pipenv install gunicorn
+gunicorn "urlshort:create_app()" -b 0.0.0.0
+sudo apt install nginx
+systemctl status nginx
+sudo nano /etc/nginx/sites-enabled/default
+replace location {} with gunicorn.org/#deployment
+gunicorn "urlshort:create_app()" -b 0.0.0.0 --daemon
+
+create db using flask_sqlalchemy:
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+db = SQLAlchemy(app)
+>>> python
+>>> from app import db
+>>> db.create_all()

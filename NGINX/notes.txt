@@ -1,0 +1,224 @@
+https://github.com/LinkedInLearning/learning-nginx-2492317
+
+NGINX:
+config: C-like syntax
+centralised location blocks
+dynamic content requires external processing
+more efficient at serving static content
+native caching and load-balancing capabilities
+
+Apache:
+config: XML syntax
+distributed .htaccess file
+dynamic content is natively processed with modules
+less efficient at serving static content
+caching and load-balancing capabilities with modules
+
+create temporary server allowing traffic on port 22 for ssh traffic, port 80 for web traffic and port 443 for encrypted web traffic
+add elastic ip and activate
+chmod 600 {serverKeyPairFile}.pem
+ls -ltr    # check permissions
+ssh -i ./{serverKeyPairFile}.pem {dnsServer}
+
+install NGINX:
+sudo su -    # run commands as admin
+apt update
+apt install nginx
+nginx -v
+
+run NGINX:
+sudo su -
+systemctl status nginx
+systemctl status nginx --no-pager
+systemctl start nginx
+systemctl reload nginx
+systemctl stop nginx
+nginx -h    # help
+nginx -t    # test config file and exit
+nginx -T    # test config file, dump and exit
+
+main config file (nginx.conf):
+sudo su -
+cd /etc/nginx/
+view nginx.conf
+:Q    # to quit
+
+create server config:
+sudo su -
+unlink /etc/nginx/sites-enabled/default    # unlink default file
+vim /etc/nginx/conf.d/{filename}.conf      # create new conf file
+i - insert
+server {
+    listen: 80 default_server;
+    server_name {filename}.local www.{filename}.local;
+    index index.html index.htm index.php;
+    root /var/www/{filename};
+}
+esc - escape insert
+:wq - write and quit
+cat /etc/nginx/conf.d/{filename}.conf      # read file
+nginx -t
+systemctl reload nginx
+systemctl status nginx
+mkdir -p /var/www/{filename}
+echo "Working!" > /var/www/{filename}/index.html
+# check server through browser to check "Working!" is displayed
+# add content files to /var/www/{filename}
+nginx -t                  # check for errors
+systenctl reload nginx    # implement changes
+
+# configure location modifiers
+server {
+    listen 80;
+    root /var/www/{filename};
+
+    location / {
+        # First attempt to serve a request as file, then
+        # as directory, then fall back to displaying a 404.
+             try_files $uri $uri/ =404;
+        }
+
+        location /images {
+        # Allow the contents of the /image folder to be listed
+                autoindex on;
+        }
+
+        # specify the page to serve for 404 errors
+        error_page 404 /404.html;
+
+        # an exact match location for the 404 page
+        location = /404.html {
+                # only use this location for internal requests
+                internal;
+        }
+
+        # specify the page to serve for 500 errors
+        error_page 500 502 503 504 /50x.html;
+
+        # an exact match location for the 50x page
+        location = /50x.html {
+                # only use this location for internal requests
+                internal;
+        }
+
+        # a location to demonstrate 500 errors
+        location /500 {
+                fastcgi_pass unix:/this/will/fail;
+        }
+}
+
+
+# configure log files
+/etc/nginx/nginx.conf
+
+http {
+        ...
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+        ...
+}
+
+server {
+    ...
+    location /images {
+        # Allow the contents of the /image folder to be listed
+        autoindex on;
+
+        access_log /var/log/nginx/binaryville.local.images.access.log;
+        error_log /var/log/nginx/binaryville.local.images.error.log;
+    }
+    ...
+}
+
+# check port status
+sudo lsof -i :80 -i :443 | grep nginx
+sudo apt install net-tools
+sudo netstat -plan | grep nginx
+
+# tail the logs
+tail -f /var/logs/nginx/*.log
+
+# set up proxy
+upstream app_server_7001 {
+    server 127.0.0.1:7001;
+}
+server {
+    ...
+    # a location to proxy requests to the upstream
+    # named 'app_server_7001'
+    location /proxy {
+        # trailing slash is key
+        proxy_pass https://app_server_7001/;
+
+        # logging for access to the proxy
+        access_log /var/log/nginx/{filename}.local.proxy.access.log;
+        error_log /var/log/nginx/{filename}.local.proxy.error.log;
+    }
+    ...
+}
+
+python ./appServers.py
+
+# load balancing methods
+# round-robin
+upstream example {
+    server 127.0.0.1:7001;
+    server 127.0.0.1:7002;
+    server 127.0.0.1:7003;
+}
+# least connections
+upstream example {
+    least_conn;
+    server 127.0.0.1:7001;
+    server 127.0.0.1:7002;
+    server 127.0.0.1:7003;
+}
+# ip hashing
+upstream example {
+    ip_hash;
+    server 127.0.0.1:7001;
+    server 127.0.0.1:7002;
+    server 127.0.0.1:7003;
+}
+# weight
+upstream example {
+    server 127.0.0.1:7001 weight=2;
+    server 127.0.0.1:7002;
+    server 127.0.0.1:7003;
+}
+
+# example allow and deny directives
+location /admin {
+    allow 192.168.1.1;
+    allow 10.0.0.0/8;
+    allow 1722.16.0.0/12;
+    allow 192.168.0.0/16;
+    deny all;
+}
+
+# example authentication config
+location /admin {
+    auth_basic "Please authenticate...";
+    auth_basic_user_file /etc/nginx/passwords;
+}
+# create password file with htpasswd command (included in apache2-utils)
+apt install apach2-utils
+htpasswd -c /etc/nginx/passwords {username}
+nginx -t
+systemctl reload nginx
+
+cat create_certificate_and_key.sh
+!/bin/bash
+    openssl req -batch -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /etc/ssl/private/nginx.crt \
+        -out /etc/ssl/certs/nginx.crt
+./create_certificate_and_key.sh
+
+server {
+    listen 443 ssl default_server;
+    ssl_certificate /etc/ssl/certs/nginx.crt;
+    ssl_certificate_key /etc/ssl/private/nginx.key;
+    ...
+}
+nginx -t
+systemctl reload nginx

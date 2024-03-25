@@ -1,0 +1,43 @@
+create project:
+django-admin startproject {projectName}
+
+run server:
+python manage.py runserver
+
+create app:
+python manage.py startapp {appName}
+
+add {appName} to INSTALLED_APPS in projectName\\settings.py
+
+migrations:
+python manage.py makemigrations
+python manage.py showmigrations
+python manage.py migrate
+
+copy csv to main folder
+copy management to app folder
+
+run base commands:
+python manage.py {fileName}
+
+create superuser:
+python manage.py createsuperuser
+
+create shell:
+python manage.py shell
+
+run tests:
+python manage.py test {appName}
+
+setup test shell environment:
+python manage.py shell
+from django.test.utils import setup_test_environment
+from django.test import Client
+client = Client()
+response = client.get("/")
+response.status_code
+from django.urls import reverse
+response = client.get(reverse("polls:index"))
+response.status_code
+response.content
+response.context["latest_question_list"]

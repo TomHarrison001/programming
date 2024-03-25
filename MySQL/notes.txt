@@ -1,0 +1,7 @@
+Download MySQL 8.0 Configurator + MySQL 8.0 Workbench
+
+Create new connection:
+Connection Method: Standard (TCP/IP)
+Hostname: 127.0.0.1
+Username: root
+Password: password

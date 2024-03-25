@@ -1,0 +1,379 @@
+cat /etc/ansible/hosts
+
+10.0.1.[1:3]
+
+[all_hosts]
+target1 ansible_ssh_host=10.0.1.239
+target2 ansible_ssh_host=10.0.1.94
+target3 ansible_ssh_host=10.0.1.252
+target4 ansible_ssh_host=10.0.1.133
+target5 ansible_ssh_host=10.0.1.4
+target6 ansible_ssh_host=10.0.1.82
+
+[webservers]
+target1
+target2
+target3
+
+[dbservers]
+target4
+target5
+target6
+
+[backupservers]
+target6 backup_file=/tmp/test1
+
+[all:vars]
+temp_file=/tmp/test2
+
+[webservers:vars]
+temp_file=/tmp/test3
+
+cat webservers.yml
+--
+- hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Uninstall testpackage and sync apt index
+      apt:
+        name: testpackage
+        state: absent
+        update_cache: yes
+
+ansible-playbook webservers.yml
+
+cat tags.yml
+---
+- hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Install Apache2
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+        cache_valid_time: 3600
+      tags: apache2
+
+     - name: Install NTP
+      apt:
+        name: ntp
+        state: present
+      tags: ntp
+
+    - name: Start NTP
+      service: name-ntp state=started enabled=yes
+      tags: ntp_start
+
+
+ansible-playbook tags.yml --tags ntp
+ansible-playbook tags.yml --list-tags
+# [apache2, ntp, ntp_start]
+ansible-playbook tags.yml --skip-tags ntp-start  # runs all but ntp-start
+
+cat controlnode.yml
+---
+- hosts: localhost
+
+  tasks:
+    - name: Get local information
+      debug:
+        var: hostvars[inventory_hostname]
+        verbosity: 1
+
+ansible-playbook controlnode.yml -v  # runs all verbosity 1+, -vv, -vvv, etc.
+
+cat conn_controlnode.yml
+---
+- hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Get local information
+      debug:
+        var: hostvars[inventory_hostname]
+        verbosity: 1
+
+ansible-playbook conn_controlnode.yml -v
+
+ansible-playbook tags.yml --start-at-task 'Install NTP'
+ansible-playbook tags.yml --step  # asks to run each task individually
+ansible-playbook tags.yml
+
+cat invvars.yml
+---
+- hosts: webservers
+
+  tasks:
+    - name: Create a file
+      file:
+        dest: '{{temp_file}}'
+        state: '{{file_state}}'
+      when: temp_file is defined
+
+ansible-playbook invvars.yml -e file_state=touch
+ansible-playbook invvars.yml -e file_state=absent
+
+sudo apt install python3-pip
+sudo pip3 install boto3
+cd /opt/ansible/inventory/
+cat aws_ec2.yaml
+---
+plugin: aws_ec2
+aws_access_key: ...
+aws_secret_key: ...
+keyed_groups:
+  - key: tags
+    prefix: tag
+compose:
+  ansible_host: private_ip_address
+
+
+cat /etc/ansible/ansible.cfg
+...
+[inventory]
+# enable inventory plugins...
+#enable_plugins = host_list, virtualbox, yaml, constructed
+enable_plugins = aws_ec2
+...
+
+ansible-inventory -i /opt/ansible/inventory/aws_ec2.yaml --list
+
+cat jinja2.j2
+A message from your node:
+ {{ inventory_hostname }}
+
+Today's message:
+{{ webserver_message }}
+
+sudo vim jinja.j2  # to edit the file
+cat use_templates.yml
+---
+- name: Make sure Web Server is running
+  hosts: webservers
+  become: yes
+  vars:
+    webserver_message: "This is my clever message"
+
+  tasks:
+    - name: Start httpd
+      service:
+        name: apache2
+        state: started
+
+    - name: Create index.html using Jinja2
+      template:
+        src: jinja2.j2
+        dest: /var/www/html/index.html
+
+ansible-playbook use_templates.yml
+
+cat cond.yml
+---
+- hosts: all_hosts
+  become: yes
+
+  tasks:
+    - name: Upgrade in Redhat
+      when: ansible_os_family == "Redhat"
+      yum: name=* state=latest
+
+    - name: Upgrade in Debian
+      when: ansible_os_family == "Debian"
+      apt: upgrade=dist update_cache=yes
+
+ansible-playbook cond.yml
+
+cat loop1.yml
+---
+- hosts: webservers
+  become: yes
+  vars:
+    packages: [git,vim,ruby]
+
+  tasks:
+    - name: Install packages
+      apt:
+        name: '{{packages}}'
+        state: latest
+
+ansible-playbook loop1.yml
+
+cat loop2.yml
+---
+- hosts: webservers
+  become: yes
+  vars:
+    websites: 
+      aws_sites:
+        author: name1
+        authorid: n1
+      ms_sites:
+        author: name2
+        authorid: n2
+      google_sites:
+        author: name3
+        authorid: n3
+
+  tasks:
+    - name: Print data
+      debug:
+        msg: 'Here are the results: {{item.value.author_id}}'
+      with_dict: '{{websites}}'
+      when: 'item.value.author_id == "n1"'
+
+ansible-playbook loop2.yml
+
+ansible-playbook use_templates.yml --check  # check tests the command
+
+cd /etc/ansible/roles/
+sudo ansible-galaxy init testrole1
+cd testrole1/
+ls
+cd tasks
+cat main.yml
+---
+# tasks file for testrole1
+
+cd /etc/ansible/roles/testrole1/defaults/
+cat main.yml
+---
+# dfaults file for testrole1
+myvar: THIS IS THE DEFAULT FROM DEFAULTS!
+
+cd ~
+cat roles.yml
+---
+- hosts: webservers
+  become: yes
+
+  roles:
+  - testrole1
+cd /etc/ansible/roles/testrole1/tasks
+cat main.yml
+---
+# tasks file for testrole1
+- name: Test variable
+  debug:
+    var: myvar
+
+ansible-playbook roles.yml
+cd /etc/ansible/roles/testrole1/vars
+sudo vim main.yml
+# vars file for testrole1
+myvar: THIS IS A VALUE FROM VARS IN THE ROLE
+cd ~
+ansible-playbook roles.yml
+ansible-playbook roles.yml -e "myvar='THIS IS AN OVERRIDE'"
+
+cd /etc/ansible/roles/testrole1/defaults
+sudo vim main.yml
+# vars file for testrole1
+myvar: THIS IS A VALUE FROM VARS IN THE ROLE
+webserver_message: THIS IS A DEFAULT MESSAGE!
+cd ~
+ansible-playbook roles.yml
+ansible-playbook roles.yml -e "webserver_message='This is my real message'"
+
+# download a collection from ansible-galaxy
+ansible-galaxy install geerlingguy.aws-inspector
+cd /etc/ansible/roles/geetlingguy.aws-inspector
+ls
+
+sudo ansible-galaxy install ansible-network.aws
+
+ansible-valut create test1.yml  # password protected files
+ansible-playbook test1.yml  # fails because no secret added
+ansible-playbook test1.yml --ask-valut-pass
+ansible-vault edit test1.yml
+
+ansible-valut encrypt_string --vault-id @prompt thisismysecretstring
+cat tags.yml
+---
+- hosts: webservers
+  become: yes
+
+  vars:
+    secret: PASTE_SECRET_KEY_HERE
+...
+  tasks:
+    ...
+    - name: Print
+      debug:
+        var: secret
+
+ansible-playbook tags.yml --ask-vault-pass
+
+cat ip_address.yml
+---
+- hosts: localhost
+  connection: local
+
+  vars:
+    ipgw: 10.10.0.1
+    ipnm: 255.255.255.224
+
+  tasks:
+  - set_fact: ip1="{{ipgw}}/{{ipnm}}"
+  - set_fact: ip2="{{ip1|ipaddr('network/prefix')}}"
+  - debug:
+       msg: "Our network is {{ip2}}, gateway is {{ipgw}}" 
+  - set_fact: ip3="{{ipgw|ipaddr('int') + 1}}"
+  - set_fact: ip4="{{ip3|ipv4('address')}}/{{ip2|ipaddr('prefix')}}"
+  - debug:
+       msg: "The next host address is: {{ip4}}"
+
+ansible-playbook ip_address.yml
+
+cat webservers.yml
+---
+- hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Uninstall testpackage and sync apt index
+      apt:
+        name: testpackage
+        state: absent
+        update_cache: yes
+
+cat register_state.yml
+---
+- hosts: webservers
+
+  vars:
+    target: /tmp/idempotent.txt
+
+  tasks:
+  - name: An idempotent file creation task
+    copy:
+      src: files/idempotent.txt
+      dest: '{{target}}'
+
+  - name: Modify the file
+    command: sed -ie 's/file/change/' {{target}}
+
+  - name: Discover state
+    command: grep 'change' {{target}}
+    register: grep_state
+    ignore_errors: true
+
+  - name: Show the state of the file
+    debug:
+      var: grep_state.rc
+
+  - name: Print based on state - success
+    debug:
+      msg:
+      - "The change is there!"
+    when: grep_state.rc == 0
+
+  - name: Print based on state - failed
+    debug:
+      msg:
+      - "The change is not there!"
+    when: grep_state.rc != 0
+
+ansible-playbook register_state.yml

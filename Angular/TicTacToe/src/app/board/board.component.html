@@ -1,0 +1,22 @@
+<div class="header-bar">
+  <h1>Tic Tac Toe</h1>
+  <a class="label" href="newGame()">New Game</a>
+</div>
+
+<ul class="message">
+  <li>Current Player: {{ player }}</li>
+</ul>
+
+<main>
+  <app-square
+    *ngFor="let val of squares; let i = index"
+    [value]="val"
+    (click)="makeMove(i)"
+  >
+  </app-square>
+</main>
+
+<ul class="message">
+  <li *ngIf="winner">Player {{ winner }} won the game.</li>
+  <li *ngIf="!winner && fullGrid">The game was a draw.</li>
+</ul>

@@ -1,0 +1,14 @@
+<h2>{{ mediaItem.name | uppercase | slice: 0: 10 }}</h2>
+<div *ngIf="mediaItem.watchedOn">{{ mediaItem.watchedOn | date }}</div>
+<ng-template [ngIf]="mediaItem.category">
+    <div>{{ mediaItem.category }}</div>
+</ng-template>
+<div>{{ mediaItem.year }}</div>
+<div [mwFavourite]="mediaItem.isFavourite" class="tools">
+    <a (click)="onDelete()" class="delete">
+        remove
+    </a>
+    <a class="details">
+        watch
+    </a>
+</div>

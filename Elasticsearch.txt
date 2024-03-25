@@ -1,0 +1,150 @@
+elastic.co
+
+ES Cluster 1:
+Username: elastic
+Password: R0Rwk6irac2j7cZb80tGexhg
+
+## Overall cluster health
+GET /_cat/health?v
+
+## Node health
+GET /_cat/nodes?v
+
+## List indices
+GET /_cat/indices?v
+
+## Create 'sales' index
+PUT /sales
+
+## Add 'order' to 'sales' index
+PUT /sales/_doc/123 
+{
+  "orderID": "123",
+  "orderAmount": "500"
+}
+
+## Retrieve document
+GET /sales/_doc/123
+
+## Delete 'sales' index
+DELETE /sales
+
+
+ES_HOST="{Elasticsearch Endpoint}"
+echo $ES_HOST
+ES_API_KEY="{API Key}"
+echo $ES_API_KEY
+vi reqs
+i - INSERT
+{ "index" : { "_index" : "my-test", "_id" : "1" } }
+{ "col1" : "val1" }
+{ "index" : { "_index" : "my-test", "_id" : "2" } }
+{ "col1" : "val2" }
+{ "index" : { "_index" : "my-test", "_id" : "3" } }
+{ "col1" : "val3" }
+esc -> :wq
+ls
+curl -XPOST -i -k \
+-H "Content-Type: application/x-ndjson" \
+-H "Authorization: ApiKey $ES_API_KEY" \
+$ES_HOST/bulk --data-binary "@reqs"; echo
+
+GET /_cat/indices
+GET /my-test
+GET /my-test/_doc/2
+
+curl -XPOST -i -k \
+-H "Content-Type: application/x-ndjson" \
+-H "Authorization: ApiKey $ES_API_KEY" \
+$ES_HOST/bank/bulk?pretty --data-binary @filename.json; echo
+
+Kibana -> Data View -> Create data view:
+name: bank
+etc.
+
+
+GET bank/_search  -- SELECT * FROM bank
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "state": "CA"
+    }
+  }
+}
+GET bank/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"state": "CA"}},
+        {"match": {"employer": "Techcade"}}
+      ],
+      "must-not": [
+        {"match": {"gender": "F"}},
+      ]
+    }
+  }
+}
+GET bank/_search
+{
+  "query": {
+    "term": {                         ## returns acc. no. 516 and 850
+      "account_number": [516, 850]
+    }
+  }
+}
+GET bank/_search
+{
+  "query": {
+    "range": {                         ## returns acc. no. 516-850
+      "account_number" {
+        "gt": 515, "lt": 851
+      }
+    }
+  }
+}
+
+GET bank/_analyze
+{
+  "tokenizer": "standard",
+  "text": "This is some example text."
+}
+GET bank/_analyze
+{
+  "tokenizer": "uax_url_email",
+  "text": "you@example.com login at https://www.website.com."
+}
+
+GET bank/_search
+{
+  "size": 0,
+  "aggs": {
+    "states": {
+      "terms": {"field": "state.keyword"},
+      "aggs": {
+        "avg": {
+          "field": "balance"
+        }
+      },
+      "age": {
+        "terms": {
+          "field": "age"
+        }
+      }
+    }
+  }
+}
+
+GET bank/_search
+{
+  "size": 0,
+  "aggs": {
+    "bals": {
+      "histogram": {
+        "field": "balance",
+        "interval": 500
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{% extends "base.html" %} {% block title %}Notes{% endblock %} {% block
+card_header %}
+<div class="header-bar">
+  <h1>Hello {{ user.first_name }}</h1>
+  <a href="/logout">Logout</a>
+</div>
+{% endblock %} {% block content %}
+<div class="card-body">
+  <ul id="notes">
+    {% for note in user.notes %}
+    <li>
+      {{ note.data }}
+      <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+        <span>&times;</span>
+      </button>
+    </li>
+    {% endfor %}
+  </ul>
+  <form method="POST">
+    <textarea name="note" style="resize: none"></textarea>
+    <br />
+    <input class="button" type="submit" value="Add Note" />
+  </form>
+</div>
+{% endblock %}

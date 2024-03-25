@@ -1,0 +1,517 @@
+Use a public cloud service (AWS, Azure, etc.) to deploy a Jenkins server
+
+AWS:
+- Create a key pair for SSH
+- Create an EC2 instance using Ubuntu AMI
+- Create an elastic IP for persistent DNS assignment
+- Connect to the server and install NGINX and Jenkins
+
+Script to update Ububtu, install NGINX, install Jenkins
+
+ls -ltr key-pair.pem
+chmod 600 key-pair.pem
+ssh -i key-pair.pem ubuntu@{Public IPv4 DNS}
+sudo su -
+vim install.sh
+
+echo "# $(date) Installation is starting..."
+echo "# $(date) Install jenkins key and package configuration..."
+curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | tee \
+    /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian binary/ | tee \
+    /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+echo "# $(date) Install Java 11, NGINX, and Jenkins..."
+apt update
+apt-get -y upgrade
+apt-get -y install \
+    openjdk-11-jdk \
+    nginx \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+apt-get -y install jenkins
+echo "# $(date) Configure Jenkins..."
+echo "# $(date) Skip the installation wizard on first boot..."
+echo "JAVA_ARGS=\"-Djenkins.install.runSetupWizard=false\"" >> /etc/default/jenkins
+echo "# $(date) Download the list of plugins..."
+wget https://raw.githubusercontent.com/jenkinsci/jenkins/master/core/src/main/resources/jenkins/install/platform-plugins.json
+echo "# $(date) Use the keyword 'suggest' to find the suggested plugins in the list..."
+grep suggest platform-plugins.json | cut -d\" -f 4 | tee suggested-plugins.txt
+echo "# $(date) Download the plugin installation tool"
+wget https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.12.3/jenkins-plugin-manager-2.12.3.jar
+echo "# $(date) Run the plugin installation tool..."
+/usr/bin/java -jar ./jenkins-plugin-manager-2.12.3.jar \
+	--verbose \
+    --plugin-download-directory=/var/lib/jenkins/plugins \
+    --plugin-file=./suggested-plugins.txt >> /var/log/plugin-installation.log
+echo "# $(date) Update the permissions on the plugins directory..."
+chown -R jenkins:jenkins /var/lib/jenkins/plugins
+echo "# $(date) Configure NGINX..."
+unlink /etc/nginx/sites-enabled/default
+tee /etc/nginx/conf.d/jenkins.conf <<EOF
+upstream jenkins {
+    server 127.0.0.1:8080;
+}
+server {
+    listen 80 default_server;
+    listen [::]:80  default_server;
+    location / {
+        proxy_pass http://jenkins;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+}
+EOF
+echo "# $(date) Reload NGINX to pick up the new configuration..."
+systemctl reload nginx
+echo "# $(date) Install docker..."
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+    gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt update
+apt-get -y install docker-ce docker-ce-cli containerd.io
+docker run hello-world
+systemctl enable docker.service
+systemctl enable containerd.service
+usermod -aG docker ubuntu
+usermod -aG docker jenkins
+echo "# $(date) Restart Jenkins..."
+systemctl restart jenkins
+echo "# $(date) Copy the initial admin password to the root user's home directory..."
+cp /var/lib/jenkins/secrets/initialAdminPassword ~
+clear
+echo "Installation is complete."
+echo "# Open the URL for this server in a browser and log in with the following credentials:"
+echo
+echo
+echo "    Username: admin"
+echo "    Password: $(cat /var/lib/jenkins/secrets/initialAdminPassword)"
+echo
+echo
+
+:wq
+source install.sh
+
+Jenkins > New item > 'first-pipeline' > Pipeline > Pipeline Script > Hello World
+Build Now
+
+Declarative pipeline:
+
+pipeline {
+  agent any
+  stages {
+    stage('Requirements') {
+      steps {
+        echo 'Getting Requirements...'
+      }
+    }
+    stage('Build') {
+      steps {
+        echo 'Building...'
+      }
+    }
+    stage('Test') {
+      steps {
+        echo 'Test 1...'
+        echo 'Test 2...'
+        echo 'Test 3...'
+      }
+    }
+    stage('Report') {
+      steps {
+        echo 'Reporting...'
+      }
+    }
+  }
+}
+
+Build Now
+
+Snippet Generator:
+archiveArtifacts: Archive the artifacts
+Files to archive: *.txt
+Do not fail if returns nothing
+Archive only if successful
+Fingerprint all artifacts
+Use default
+Treat include as case sensitive
+Generate > Copy and paste into pipeline script
+Build Now
+Refresh > Last Successful Archive > .txt
+
+Globally scoped vars:
+pipeline {
+  agent any
+  environment {
+    MAX_SIZE = 10
+  }
+  ...
+}
+
+Locally scoped vars:
+pipeline {
+  ...
+  stages {
+    stage('Scale by 10') {
+      environment {
+        MAX_SIZE = 10
+      }
+      ...
+    }
+  }
+}
+
+echo "${env.MAX_SIZE}"
+
+Parameters:
+pipeline {
+  agent any
+  parameters {
+    string(name: 'USERNAME',
+      defaultValue: 'Rock',
+      description: 'Enter your username')
+  }
+  ...
+}
+
+"${params.USERNAME}"
+Build with Parameters
+
+pipeline {
+  agent any
+  stages {
+    stage('Conditional Expressions') {
+      when {
+        expression { ${params.USERNAME} == 'Rock' }
+      }
+      steps {
+        input message: 'Confirm deployment to production...', ok: 'Deploy'
+        sh "printf \"${params.CHANGELOG}\" > report.txt"
+      }
+   }
+}
+
+Pipeline script from SCM
+SCM: Git
+# Enter repo url and credentials
+Build Now
+-- Git repo
+   |-- .gitignore
+   |-- README.md
+   `-- Jenkinsfile
+Jenkinsfile:
+pipeline {
+  agent any
+  options {
+    buildDiscarder(logRotator(daysToKeepStr: '10', numToKeepStr: '10'))
+    timeout(time: 12, unit: 'HOURS')
+    timestamps()
+  }
+  triggers {
+    cron '@midnight'
+  }
+  stages {
+    stage('Requirements') {
+      steps {
+        echo 'Getting Requirements...'
+      }
+    }
+    stage('Build') {
+      steps {
+        echo 'Building...'
+      }
+    }
+    stage('Test') {
+      steps {
+        echo 'Test 1...'
+        echo 'Test 2...'
+        echo 'Test 3...'
+      }
+    }
+    stage('Report') {
+      steps {
+        echo 'Reporting...'
+      }
+    }
+  }
+  post {
+    always {
+      echo "This step will always run at the end regardless of SUCCESS/FAIL"
+    }
+  }
+}
+
+Pipeline:
+GitHub project: True
+GitHub hook trigger for GITScm polling: True
+Branch Specifier: */main
+Script Path: Jenkinsfile
+Build Now
+
+Github repo > Settings > Webhooks > Add webhook > Payload URL: {Public IPv4 DNS}/github-webhook/ > Content type: application/json
+
+sh('/bin/build.sh') - to run sh files (shell commands on linux/macOS)
+bat('C:\bin\build.bat') - to run bat files (shell commands on windows)
+
+# Run scripts from the pipeline
+dir("${env.WORKSPACE}/environments/test") {
+sh('''
+  terraform init
+  terraform plan
+    ''')
+}
+
+# Fibonacci
+
+pipeline {
+  agent any
+  parameters {
+    choice(name: 'NUMBER',
+      choices: [10,20,30,40,50,60,70,80,90],
+      description: 'Select the value for F(n) for the Fibonacci sequence')
+  options {
+    buildDiscarder(logRotator(daysToKeepStr: '10', numToKeepStr: '10'))
+    timeout(time: 12, unit: 'HOURS')
+    timestamps()
+  }
+  triggers {
+    cron '@midnight'
+  }
+  stages {
+    stage('Make executable') {
+      steps {
+        sh('chmod +x ./scripts/fibonacci.sh')
+      }
+    }
+    stage('Relative path') {
+      steps {
+        sh("./scripts/fibonacci.sh ${env.NUMBER}")
+      }
+    }
+    stage('Full path') {
+      steps {
+        sh("${env.WORKSPACE}/scripts/fibonacci.sh ${env.NUMBER}")
+      }
+    }
+    stage('Change directory') {
+      steps {
+        dir("${env.WORKSPACE}/scripts") {
+          sh("./fibonacci.sh ${env.NUMBER}")
+        }
+      }
+    }
+  }
+}
+
+fibonacci.sh:
+#!/bin/bash
+N=${1:-10}
+
+a=0
+b=1
+
+echo "The Fibonacci series is : "
+
+for (( i=0; i<N; i++ ))
+do
+    echo -e "$i\t$a"
+    fn=$((a + b))
+    a=$b
+    b=$fn
+done
+
+# Plugins
+Manage Jenkins > Manage Plugins > Available > Search 'embeded' > Check Embeddable Build Status > Restart Jenkins...
+
+Edit README.md file:
+# pipeline-scripts
+[![Build Status]({Public IPv4 DNS}/buildStatus/icon?job=fibonacci)]({Public IPv4 DNS}/job/fibonacci/)
+Run scripts from a pipeline.
+# You can also copy markdown from plugin description
+
+# nodes and agents
+https://github.com/jenkinsci/jenkins.git
+agent {
+  label 'linux'
+}
+agent {
+  docker ...
+}
+tools {
+  maven 'Maven-3.8.4'
+}
+Global Tool Configuration > Maven > Add Maven > Name: Maven-3.8.4 (Install automatically - from apache version 3.8.4)
+Manage nodes and clouds > New node > linux + permanent > Remote root directory: /home/ec2-user > Labels: linux > Usage: Only build jobs with label expressions matching this node > Laumch method: Launch via SSH
+
+Jenkinsfile
+pipeline {
+  agent { label 'linux' }
+  tools {
+    maven 'Maven-3.8.4'
+  }
+  stages {
+    stage('Source') {
+      steps {
+        sh 'mvn --version'
+        sh 'git --version'
+        git branch: 'main',
+          url: 'https://github.com/LinkedInLearning/essential-jenkins-2468076.git'
+      }
+    }
+    stage('Clean') {
+      steps {
+        dir("${env.WORKSPACE}/Ch04/04_02-ssh-agent"){
+          sh 'mvn clean'
+        }
+      }
+    }
+    stage('Test') {
+      steps {
+        dir("${env.WORKSPACE}/Ch04/04_02-ssh-agent"){
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('Package') {
+      steps {
+        dir("${env.WORKSPACE}/Ch04/04_02-ssh-agent"){
+          sh 'mvn package -DskipTests'
+        }
+      }
+    }
+  }
+}
+
+# Add a docker agent
+docker --version
+docker ps
+Manage Plugins > Installed > Docker Pipeline (enabled)
+pipeline {
+  agent {
+    docker { image 'public.ecr.aws/docker/library/maven:3.9-sapmachine' }
+  }
+  stages {
+    stage('Source') {
+      steps {
+        sh 'mvn --version'
+        sh 'git --version'
+        git branch: 'main',
+          url: 'https://github.com/LinkedInLearning/essential-jenkins-2468076.git'
+      }
+    }
+    stage('Clean') {
+      steps {
+        dir("${env.WORKSPACE}/Ch04/04_03-docker-agent"){
+          sh 'mvn clean'
+        }
+      }
+    }
+    stage('Test') {
+      steps {
+        dir("${env.WORKSPACE}/Ch04/04_03-docker-agent"){
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('Package') {
+      steps {
+        dir("${env.WORKSPACE}/Ch04/04_03-docker-agent"){
+          sh 'mvn package -DskipTests'
+        }
+      }
+    }
+  }
+}
+
+# Copy Artifact Plugin
+Manage Plugins > Installed > Copy Artifact Plugin (enabled)
+Jenkinsfile: create-artifact
+pipeline {
+  agent any
+  options {
+    copyArtifactPermission 'read-artifact'
+  }
+  stages {
+    stage('Create-Artifact') {
+      steps {
+        // the `set` command is a built-in shell command that
+        // prints the name and values of all variables visible
+        // to the shell's environment.
+        // https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+        //
+        // The following uses the `sh` build step to run the
+        // `set` command on the local system.  Note that if this
+        // pipeline is run on a system that does not have a
+        // built-in `set` command, any builds of the pipeline
+        // will fail.  This may be the case on systems running
+        // Windows OS with Powershell.
+        sh "set > report.txt"
+      }
+    }
+  }
+  post {
+    always {
+       archiveArtifacts allowEmptyArchive: true,
+         artifacts: 'report.txt',
+         fingerprint: true,
+         followSymlinks: false,
+         onlyIfSuccessful: true
+    }
+  }
+}
+Jenkinsfile: read-artifact
+pipeline {
+  agent any
+  stages {
+    stage('Read-Artifact') {
+      steps {
+        copyArtifacts projectName: 'create-artifact',
+          filter: 'report.txt',
+          fingerprintArtifacts: true,
+          selector: lastSuccessful()
+      }
+    }
+  }
+}
+
+# Code coverage reports - measures the code coverage during testing
+Popular report formats: JaCoCo, Cobertura
+# Requires Python
+Ubuntu:
+sudo apt install python3
+sudo apt install python3-venv
+
+python3 -m venv test
+ls
+> test
+. test/bin/activate
+Plugin Manager > JUnit Plugin (enabled)
+Plugin Manager > Code Coverage API Plugin (enabled)
+# Configure github pipeline
+Test Results >
+Status > 
+
+# Secure Jenkins with user accounts
+Manage Users > Create User
+Configure Global Security > Matrix-based security > Add user
+Configure Global Security > Project-based security > Add user
+Pipeline > Configure > Enable project based security
+
+# credentials
+environment {
+  STRING = credentials('secret-value')
+  LOGIN = credentials('login')
+}
+env.STRING
+env.LOGIN      username:password
+env.LOGIN_USR  username
+env.LOGIN_PSW  password
+steps {
+  withCredentials([string(credentialsId:'apikey',variable:'APIKEY')]) {
+    sh"./build_script.sh ${env.APIKEY}"
+  }
+}

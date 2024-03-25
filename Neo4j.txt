@@ -1,0 +1,96 @@
+neo4j.com
+
+Resource Description Framework (RDF):
+- Subject - Predicate - Object
+Propery Graph:
+- Label (node), Type (edge), Properties
+
+Tom, a Customer, BUYS a pc, a Product, on November 20 2018.
+
+Node:             BUYS          Node:
+(Customer) ------------------>  (Product)
+name: Tom     date: 20181120    type: pc
+
+Labels: Customer, Product
+Relationship: BUYS
+Properties: name: Tom, type: pc
+
+CREATE (learner: Learner {name: 'Tom'}),
+       (hello: Greeting {message: 'Hello world.'}),
+       (learner)-[:SAYS]->(hello)
+MATCH (me: Learner)
+RETURN me                                  ## returns all Learner nodes
+MATCH (learner: Learner)-[rel]-(greeting: Greeting)
+RETURN *
+
+// return all nodes
+MATCH (n)
+RETURN n
+
+// return 10 student nodes
+MATCH (n: Student)
+RETURN n LIMIT 10
+
+MATCH (n: Student {first_name: 'Tom'})
+RETURN n
+---or---
+MATCH (n: Student)
+WHERE n.first_name = 'Tom'
+RETURN n
+
+MATCH (s: Student)--(c:Country)
+RETURN n
+
+MATCH (s: Student)-[r:OBTAINED]->()
+WHERE r.gpa > 3.98
+RETURN s.first_name as `First Name`, s.last_name as `Last Name`, r.gpa as GPA
+
+MATCH (s:Student)-[:STUDIED_ABROAD_IN]->(c:Country)
+RETURN count(s) AS `Students Abroad`
+
+MATCH (s: Student)--(c:Country)
+RETURN collect(s.first_name + ' ' + s.last_name) AS Name
+
+MATCH (s: Student)--(c:Country)
+WITH collect(s) AS students, c
+RETURN size(students) AS `Number of Students`, c.name AS Country
+ORDER BY students DESC LIMIT 10
+
+MATCH (s:Student)--(c:Country)
+WITH collect(s) AS students, c WHERE size(students) >= 150
+RETURN size(students) AS `Number of Students`, c.name AS Country
+
+MATCH (:Year {value: 2011})<-[:GRADUATED_IN]-(s:Student)-[:STUDIED_ABROAD_IN]->(:Country {name: "Greece"})
+RETURN s.first, s.last
+---or---
+MATCH (s:Student)-[:STUDIED_ABROAD_IN]->(:Country {name: "Greece"}),
+      (s)-[:GRADUATED_IN]->(:Year {value: 2011})
+RETURN s.first, s.last
+
+// Find all students within 2 hops of student Tom
+MATCH (s1:Student {first: 'Tom'})-[*0..2]-(s2:Student)
+RETURN DISTINCT s2.first, s2.last
+
+MATCH (s1:Student {first: 'Tom'}),
+      (s2:Student {first: 'Conor'}),
+      p = shortestpath((s1)-[*]-(s2))
+RETURN p
+
+MATCH (p1: Player {name: 'Rock'})
+MATCH (p2: Player {name: 'Rockafella'})
+CREATE (p1)-[:FRIENDS {since: 20200101}]-(p2)
+// Update date friended
+MATCH (p1:Player {name: 'Rock'})-[r:FRIENDS]-(p2:Player {name: 'Rockafella'})
+SET r.since = 20180101
+SET p1.class = 'Mage'
+REMOVE p1.class
+SET p1:Admin                                        // add label
+REMOVE p1:Admin
+
+// DELETE ALL
+MATCH n
+DETACH DELETE n
+
+// DELETE relationship
+MATCH (p1:Player {name: 'Rock'})-[r:FRIENDS]-(p2:Player {name: 'Rockafella'})
+DELETE r

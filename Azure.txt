@@ -1,0 +1,126 @@
+Public cloud, private cloud (on-premise infrastructure), hybrid cloud
+
+Full-featured Services: Azure Batch, Azure AI
+Support Services: Azure App Service, Azure Search
+
+Platform as a Service (PaaS) - Hosted OSs
+Infrastructure as a Service (IaaS) - Virtual infrastrucutre
+
+Azure Resource Group
+
+Azure Resource Manager - a collection of API endpoints
+
+Declaractive syntax allows us to validate our templates.
+
+Services:
+- Function App
+- Azure DevOps
+- Virtual Machines
+- Deploy a custom template
+- Azure Monitor
+- Azure Content Delivery Network
+- Dynamic Site Accelleration
+
+Fault domains - help with unexpected outages
+Update domains - help with planned maintenance
+
+Scaling Up - handling higher loads with a single instance
+Scaling Out - handling higher numbers of instances
+
+Cloud shell:
+az appservice plan create --name dev-cakes-api --resource-group dev --sku FREE
+az webapp create --resource-group dev --plan dev-cakes-api \ 
+        --name cakes-for-all --deployment-local-git
+# copy deploymentLocalGitUrl
+
+Blob storage:
+- Ideal for video, audio, images and documents
+- Available globally via HTTPS
+- Can handle large backups and archives
+- Is cheaper than Azure Files storage
+
+Azure Files storage is better network file share
+
+Hot tier: Storage $$$, Access $
+Cold tier: Storage $$, Access $$
+Archive tier: Storage $, Access $$$
+
+CosmosDB - NoSQL (Document, Graph Oriented, Key Value and Wide Column)
+
+Azure SQL: Single Database, Hyperscale (no limits), Serverless, Elastic Pool (shared resources), Database Server
+
+Azure Function: Bindings (function.json file + code)
+
+function.json
+{
+  "bindings": [
+    {
+      "authLevel": "function",
+      "name": "req",
+      "type": "httpTrigger",
+      "direction": "in",
+      "methods": [
+        "get",
+        "post"
+      ]
+    },
+    {
+      "name": "$return",
+      "type": "http",
+      "direction": "out"
+    }
+  ],
+  "disabled": false
+}
+
+# Create Azure Function app
+Create a resource > Function App > Go to resource > Functions (+) > In Portal > Azure Blob Storage Trigger
+
+run.csx
+public static void Run(
+  [BlobTrigger("upload/{name}")]Stream uploadedBlob,
+  [Blob("backup/{name}", FileAccess.Write)]Stream stream,
+  string name,
+  ILogger log)
+{
+  await uploadedBlob.CopyToAsync(stream);
+  log.LogInformation($"C# file-uploaded function processed blob\n name: {name} \n Size: {uploadedBlob.Length})
+  log.LogInformation($"Backup created successfully.")
+}
+
+
+Function triggers: timer, queue, cosmosDB, eventGrid, eventHub
+
+Activity Functions can only be called by a trigger
+Orchestrator Functions manage the flow of associated activity functions
+
+# Create a virtual machine
+Virtual Machine > Add > Public inbound ports (allow selected ports)
+=== or ===
+shell.azure.com/bash
+az group create --name even-more-legacy --location centralus
+az vm create --resource-group even-more-legacy --name older-legacyapp \ 
+        --image Win2016Datacenter --admin-username older_legacy_admin \
+        --admin-password password
+# copy publicIpAddress
+az vm open-port --port 80 --resource-group even-more-legacy \ 
+        --name older-legacyapp
+
+# Deploy a custom template
+Search > Deploy a custom template > Create a web app > Edit template
+
+VMs virtualise hardware whereas containers virtualise OSs
+
+# Create a managed kubernetes cluster
+Azure shell:
+az aks create --resource-group dev --name aks-wesus2-donuts --node-count 1 \
+        --generate-ssh-keys
+kubectl get nodes
+
+VS > Create new project > ASP.NET Core Web Application
+Publish > Container Registry > Select Existing Azure Container Registry
+Once published, the repository will be shown in Container > Repositories
+
+NuGet Package:
+- Nucrosoft.ApplicationInsights
+

@@ -1,0 +1,232 @@
+https://learning.sap.com/learning-journey/sap-integration-suite-managed-gateway-for-spend-management-and-sap-business-network-overview
+
+Discovering SAP Integration Suite, managed gateway for spend management and SAP Business Network
+
+Integration:
+- Complex, Time Consuming, Dependency
+
+Complex Enterprise Resource Planning (ERP) require a Postmodern Application such as SAP Integration Suite, managed gateway for Spend Management and SAP Business Network
+
+SAP Integration Suite, the managed gateway  - provides tools and capabilities needed to streamline and automate your spend management processes
+The managed gateway is built on SAP Integration Suite and provides a simple way to connect SAP Ariba solutions, backend systems and trading partners
+Also it includes automated upgrades and monitoring
+
+SAP Cloud Environment includes SAP Spend Management and SAP Business Network
+SAP Spend Management includes SAP Ariba Source-to-Settle solutions (e.g. SAP Ariba Sourcing and SAP Buying and Invoicing)
+
+Secured by TLS 1.2 protocol (supports basic and certificate authentication)
+Multi Tenant for load balancing
+Test Central for built in testing 
+Integration for handshake between SAP Spend Management and SAP Business Network
+
+Buyers:
+- Add-on (SAP S/4HANA, SAP ECC)
+- SAP S/4HANA cloud edition
+- SAP Fieldglass
+- Future Plan
+- SAP Concur
+
+Suppliers:
+- Add-on (SAP S/4HANA, SAP ECC)
+- Non-SAP Integration (EDIFACT, OAGIS, EANCOM, PIDX, X12, CXML, UBL PEPPOL, GUSI, UBL xRechnung)
+
+Traditional Source-to-Pay Integration challenges:
+- High integration costs
+- Multiple use cases, lots of data and several document formats
+- Technical expertise not readily available
+
+Value proposition:
+- Simple steps to integrate: configure, extend and test
+- Self-Service - Self-Service wizard to manage the process using step-by-step guidance
+- Speed - shorter deployment with automated testing and embedded monitoring
+
+Benefits:
+- Connect once using a single sign-on via SAP Ariba applications or SAP Business Network
+- Unified gateway for integration of source-to-pay processes
+- Simple integration
+- Short deployment time with DIY integration process
+- Communcation protocols: AS2, HTTPS, VAN, RNIF
+
+Managed gateway architecture:
+- Predefined processes (Supplier lifecycle and performance management, sourcing and product sourcing, contract management, buying and invoice management, commerce automation, dynamic discounting, supply chain collaboration)
+- Extensibility (Inbuilt mapping tool, manage add-ons)
+- Test Central
+- Monitoring (transaction tracker - complete visibility of transaciton lifecycle, reprocessing for failed documents, download before and after payload)
+- Integration as a service
+- Out-of-the-box (SAP ERP, SAP S/4HANA on-premise/cloud, SAP MDG-S, OpenText VIM)
+
+Integration steps:
+- download and install add-on components (SAP Service Marketplace)
+- configure and push information
+- configure, customise and test scenarios
+- promote to production
+
+Deployment options:
+- Direct connectivity
+  - SAP Ariba hosted in the SAP Cloud (Content & Connectivity)
+  - SAP ERP or SAP S/4HANA deployed behind firewall on-premise (Managed Gateway and Add-Ons), requires installed SAP Cloud Connector (inbound communication to SAP backend systems)
+- Mediated connectivity
+  - 3 ways to connect SAP Integration Suite and SAP ERP or SAP S/4HANA (Customer Environment):
+    - SAP Integration Suite Private Tenant (Subscription service), requires installed SAP Cloud Connector
+    - 3rd party cloud (bidirectional)
+    - SAP Process Integration (PI) or SAP Process Orchestration (PO) - bidirectional
+
+SAP ERP Supported Systems:
+- Backend:
+  - SAP EHP0 (SAP_APPL 600 SP22)
+  - SAP EHP2 (SAP_APPL 602 SP12)
+  - SAP EHP3 (SAP_APPL 603 SP11)
+  - SAP EHP4 (SAP_APPL 604 SP12)
+  - SAP EHP5 (SAP_APPL 605 SP09)
+  - SAP EHP6 with non-HANA DB (SAP_APPL 606 SP05)
+  - SAP EHP6 with HANA DB (SAP_APPL 606 min supported)
+  - SAP EHP7 (SAP_APPL 617 min supported)
+  - SAP EHP8 (SAP_APPL 618 min supported)
+  - SAP_BASIS 700 SP27 is the SAP Basis version for all above SAP ERP versions
+- AddOn:
+  - SAP Integration Suite
+- Software Components:
+  - Base Component
+	- SAP Ariba Sourcing Service Contract feature only
+	- RETAIL Article Master Data Integration only
+	- ARBCI1 100 - For EhP 0 and higher
+	- ARBCI2 100 - For EhP 4 and higher
+	- ARBCIGR 100 - For EhP 0 and higher
+
+SAP S/4HANA Supported Systems:
+- Backend:
+	- On Premise Editions: 1610, 1709, 1809, 2020, 2021, 2022
+  - SAP_BASIS 700 SP27 is the SAP Basis version for all above SAP ERP versions
+- AddOn:
+	- SAP Integration Suite
+- Software Components:
+	- ARBCI1 10S
+	- ARBCI2 10S
+	- ARBCIGR 10S
+
+- AddOn Language: English
+- SAP PI/PO:
+	- SAP PI 7.1; SAP PI 7.3; SAP PO 7.4; SAP PO 7.5
+- Transport Layer Security:
+	- TLS 1.2
+
+SAP Ariba only supports the 2 versions of the support pack:
+- The current version (n) and n-1
+
+Before installing SAP Integration Suite for RETAIL version 1.0 (ARBCIGR 100) you must first install:
+- SAP Ariba: ARBCI1 100 SP01
+- Enterprise: EA-RETAIL EhP0 SP22
+- SAP Ariba Sourcing or SAP Ariba Contracts: ARBCI2 100
+
+Data centers:
+- US, FedRAMP, EU, UAE, Kingdom of Saudi Arabia, China
+
+Cloud Connector:
+- SAP Cloud Connector serves as the link between SAP Business Technology Platform and existing on-premise systems
+- Runs an on-premise agent in a secured network and acts as a reverse invoke proxy between the on-premise network and SAP Business Technology Platform
+- A single Cloud Connector supports connectivity with multiple backend SAP systems
+- Easy setup, clear configuration
+- No firewall required
+- Creates SSL Tunnel (uses TLS 1.2)
+
+To download requisite add-on components you need access to SAP Service Marketplace
+Separate components are provided based on the backend system type
+Backend system types:
+- ARIBA CLOUD INT SAP ERP: SAP ERP 6.0 (ECC) system
+- ARIBA CLOUD INT SAP S/4HANA: SAP S/4HANA on-premise system
+
+SAP ERP (ECC):
+ARBCI1 100 - primary and mandatory component - all service packs (SP) and/or enhancement packs (EhP) levels
+ARBCI2 100 - optional component required if you're a customer using the Contract Services feature of SAP Ariba - EhP 4 and higher
+ARBCIGR 100 - optional component required if you're a customer using the Retail Article Master Data feature of SAP Ariba Sourcing - all SP and/or EhP levels
+
+SAP ERP(ECC):
+EhP0-EhP3 - Mandatory: ARBCI1 100, Optional: ARBCIGR 100
+EhP4-EhP7 - Mandatory: ARBCI1 100, Optional: ARBCI2 100 (Attribute Change Package(ACP): ARBCI2====100), ARBCIGR 100
+EhP8 - Mandatory: ARBCI1 100 (ACP: ARBCI1====100), Optional: ARBCI2 100 (ACP: ARBCI2===100), ARBCIGR 100
+
+SAP S/4HANA On-Premise:
+ARBCI1 10S - primary and mandatory component - all SP levels
+ARBCI2 10S - optional for customers using Contract Services feature of SAP Ariba Sourcing - all SP levels
+ARBCIGR 10S - optional for customers using Retail Article Master Data feature of SAP Ariba Sourcing - all SP levels
+
+SAP S/4HANA On-Premise - Mandatory: ARBCI1 10S (ACP: ARBCI1====10S), Optional: ARBCI2 100 (ACP: ARBCI2====10S), ARBCIGR 100
+
+Global settings must be configured, you'll find nodes for:
+- global settings (configuration activities of any SAP Ariba solutions)
+- general settings (configuration activities for a specific integration regardless of transactions/documents)
+- application-specific settings (configuration activities for a specific transaction/document)
+
+AddOns have the .SAR extension
+SAP's add-on installation tool (SAINT) enables users to install add-ons directly from their standard SAP system
+
+navigate to add-on:
+1. enter transcation code SPRO
+2. choose SAP reference IMG
+3. from options in structure, select Integration with other SAP components
+4. select SAP Integration Suite, managed gateway
+
+3 paths to connect/access the managed gateway:
+- SAP Business Network (enable from TEST account before PRODUCTION account)
+  - Enable: Administration > Configuration > Cloud Integration Gateway Setup > Enable > Activate via email > Login to Ariba Cloud Integration Gateway
+  - Access: Manage > Administration > Integration Manager > Managed Gateway for Spend&Network > Enable and I Have Read... > Activate via email > Visit SAP Integration Suite
+- SAP Ariba Sourcing
+- SAP Ariba Buying and Invoicing (enable from TEST account before PRODUCTION account)
+  - Enable: Manage > Core Administration >  Integration Manager > Managed Gateway for Spend&Network > Enable and I Have Read... > Select tasks for integration (e.g. Export Cancel Advance Payments Asynchronously) > Save > Activate via email > Visit SAP Integration Suite
+
+Integration project - where you establish handshake between SAP Ariba Spend Management (cloud applications with backend SAP system (SAP ERP or SAP S/4HANA)) and SAP Business Network
+Project creation wizard - step-by-step guidance, specify cross references and value mappings, configure/manage integration between SAP Ariba applications and your SAP backend
+
+Create a project:
+1. add a product
+2. define connectivity
+3. add mappings (not applicable for buy-side integration)
+4. define cross-reference data
+5. testing
+6. deploy to production
+
+Mappings:
+- Standard: delivered with every integration, mapping transformations are delivered for every document type available for all customers
+- Manual extension: devolved by the SAP Ariba Engineering team under special circumstances
+- Custom: created by customers using the mapping tool
+
+The managed gateway receives documents from SAP ERP or SAP S/4HANA system in a non-cXML format and transforms the, into cXML before sending them to SAP Ariba solutions
+When you upgrade to a higher version of the add-on, the mapping tool migrates the custom mappings to the new add-on
+
+Mapping tool:
+- create, edit and delete custom mappings
+- deploy, undeploy and manage versions of the custom mappings
+- edit an existing version of a mapping and save it as a new version
+- enter a reason for editing a mapping
+- deploy an older version of the mapping
+- test the new mapping
+
+Node functions:
+- Add constant value: constant values can be added to any destination field
+- Direct mapping (one-to-one): map a field from Source to Target
+- Add source condition: apply conditions based on position/value of the source element
+- Add target condition: apply conditions based on position/value of the field on the target element
+- Add for-each: used to create a target node by looping over a source element
+- Group multiple condition: multiple conditions using logic gates
+- Duplicate node: multiple, extrinsic or custom nodes can be created
+- Add target position variable: map source values to the target matching the target's occurence position
+- Add target value variable: conditional mapping applied to a target matching a source condition of the value variable type
+- Choose-when: map 1+ source elements to 1 target element with a condition for each source element
+- Create/replace node: creates a new node (not via standard mapping)
+- Delete node
+- Concat function: concatenate up to 3 source elements and map to target field
+- Substring function: choose substring from source field and add to destination field
+- Normalize function: remove whitespace from source XPath into target item
+- Format date function: set date pattern to be applied
+- Format number function: set number pattern to be applied
+- Translation function: translate a value of source field to a different value and map it to target field
+
+Master data - various objects (data: organisational, accounting, supplier, user, cross-application config, funds management, etc.) imported into your SAP Ariba Source-to-Settle (e.g. SAP Ariba Sourcing and SAP Ariba Buying and Invoicing)
+
+Migration steps:
+For Cloud Integration (CI) customers:
+- Ariba Network Adapter for SAP NetWeaver will go end-of-support on 31st Dec 2023 and customers are required to migrate to SAP Integration Suite
+- Enable managed gateway > Download, Install + Configure SAP Cloud Connector > Download, Install + Configure managed gateway add-on > Complete prerequisite tasks > Run reports to migrate data > Run report to migrate transaction configuration > Run report to migrate BAdIs + manually migrate
+For SAP Business Suite AddOn customers:
+- SAP Business Suite Add-On for SAP Business Integration will be going end-of-support on 31st Dev 2023 and customers are required to migrate to SAP Integration Suite
+- Enable managed gateway > Download, Install + Configure SAP Cloud Connector > Download, Install + Configure managed gateway add-on > Configure global settings > Configure general settings for transaction > Configure supported Spend Management and SAP Business Network transactions > Migrate the configurations from SAP Business Suite Add-on > Migrate the customisations > Deactivate the SAP Business Suite add-on settings

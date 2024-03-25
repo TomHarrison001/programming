@@ -1,0 +1,63 @@
+Virtualisation - virtual machines used to run multiple OSs and apps
+Bare-metal server - a physical server without an OS
+Hypervisor - a host or virtual server
+Virtual machine (VM) - a guest or instance
+Virtualisation manager: vCenter, Oracle VM Manager
+Virtual desktop - Virtual desktop infrastructure (VDI)
+P2V - physical to virtual
+V2V - virtual to virtual
+VM template - used to create multiple instances
+Snapshot - almost a backup of the VM setup however its not because it's stored on the same disk space as their parent VM
+Clone - clone of a VM
+
+Virtualistaion is a software technology whereas cloud is a remote location which utilises virtualisation technology. Private cloud is a type of cloud computing that can be implemented using a proprietary architecture.
+
+VMware virtualisation software is called ESXi (hypvervisor)
+Other virtualisation companies:
+Microsoft (Hyper-V)
+Oracle (OVM/OLVM)
+Citric (XenServer)
+Red Hat (KVM)
+IBM
+
+VMware Workstation Player - runs VMs on Windows, Linux or macOS
+VMware vSphere Hypervisor (ESXi) - bare-metal hypervisor (installs directly onto your physical server)
+VMware vSphere Client - interface that allows you to connect to a hypervisor (client just lilke RDP for Windows or PuTTY for Linux servers)
+VMware vCenter - manages multiple hypervisors (vSphere Client with added functionality)
+
+# Download and Install VMware Workstation Player
+# Download vSphere ESXi version 7.x
+# Create a new VM: 4GB RAM, 2 CPU, 100GB min free disk space
+# Attach the ESXi ISO image
+# After setup, access the vm through your browser with the ip given
+
+# Access ESXi through SSH
+Browser > Host > Actions > Services > Enable SSH
+---or---
+VMware Workstation Player > F2 - Customise System > Troubleshooting Options > Enable SSH (Also change hostname in network settings from localhost)
+PuTTY > Enter Host IP > Port 22 > SSH
+
+pwd
+/
+ls
+cd /var
+esxtop
+Q
+esxcli
+esxcli system
+esxcli system time
+esxcli system time get
+
+Browser > Virtual Machines > Create / Register VM > Create a new VM
+Linux1, ESXi 7.0 U2 virtual machine, Linux, CentOS8 (64-bit)
+Power on > Console > Open browser console
+
+# Download CentOS Linux 8-2111 x86_64 -dvd1.iso
+Browser > Virtual Machines > Right-Click VM > Edit settings > CD/DVD > datastore iso file > Create dir 'ISO' > Upload CentOS > Connect: True > Connect at power on: True > Save > Power on > Open browser console > Network & Host Name (change hostname from localhost)
+
+# When VM is not being used don't forget to shut down or suspend
+
+ESXi server should be connected through vCenter in order to have cloning feature
+
+# Create and recover from snapshots
+Browser > VM > Action > Snapshots

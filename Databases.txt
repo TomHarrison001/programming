@@ -1,0 +1,24 @@
+SQL: PostgreSQL, MySQL
+ACID:
+- Atomicity (entire transaction either fails or succeeds)
+- Consistency (transaction follows the constraints put in place)
+- Isolation (transaction remains the same even if done with other transactions)
+- Durability (transaction won't 
+CRUD: Create, Read, Update, Delete
+get removed from system failures)
+NoSQL: Mongo, Cassandra
+Types of NoSQL: document, key-value, wide-column, graph
+CAP: Consistency, Availability, Partition Tolerance (Choose 2)
+MySQL, Postgres, Etc. choose Consistency and Availability
+Cassandra chooses Availability and Partition Tolerance
+MongoDB chooses Consistency and Partition Tolerance
+
+-- create sql function
+CREATE FUNCTION add(integer, integer)
+RETURNS integer as 'SELECT $1 + $2'
+LANGUAGE sql
+IMMUTABLE
+RETURNS null ON null INPUT;
+
+-- call function
+SELECT add(1, 2);

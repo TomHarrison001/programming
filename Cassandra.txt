@@ -1,0 +1,50 @@
+-- Partition Key -> Partitioner (Hash Function) -> Node Identifier
+-- Node n -> Replica -> Node n+1
+-- e.g. data written to Node 3 of Data Center A is also written to Node 4 of Data Center B
+
+docker pull cassandra:latest
+docker run --name cass1_cluster cassandra:latest
+docker exec -it cass1_cluster cqlsh
+
+CREATE KEYSPACE perfmonitor 
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+-- SimpleStrategy: replicas are written to next node in cluster ring
+-- NetworkTopology: multiplay data centers, rep. factor of replicas per data center
+-- replication_factor: number of replicas of data
+
+USE perfmonitor;
+
+CREATE TABLE app_instance (
+  id uuid,
+  app_name text,
+  proc_id text,
+  host_id text,
+  cpu_time int,
+  num_io_ops int,
+  PRIMARY KEY (host_id, proc_id)
+)
+-- WITH CLUSTERING ORDER BY (proc_id DESC)
+
+DESCRIBE app_instance;
+
+SELECT * FROM app_instance WHERE host_id = 'AppServer1' AND proc_id = '1234';
+-- host_id - partition key: used to distribute data across your nodes
+-- proc_id - clustering key: used to sort data within a partition
+
+CREATE INDEX appname_idx ON app_instance(app_name);
+-- Enables the following query:
+SELECT * FROM app_instance WHERE app_name = 'WebStoreFront';
+
+SELECT JSON a, b FROM table;
+INSERT JSON a; -- adds JSON as a single row
+
+UPDATE app_instance SET num_io_ops = num_io_ops + 1 WHERE host_id = 'Server1';
+
+CREATE MATERIALIZED VIEW app_instance_view AS
+SELECT app_name, proc_id, host_id
+FROM app_instance WHERE app_name IS NOT NULL
+PRIMARY KEY (app_name, proc_id, host_id);
+
+Column Size = length of text/varchar + 1 byte
+Column Storage = Column Size * Column Use(%) / 100
+Row Storage = Rows * Sum (Column Storages) + Overhead (23B)

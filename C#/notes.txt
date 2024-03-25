@@ -1,0 +1,16 @@
+Create a new project:
+- Open target directory
+- dotnet new console (creates bin and obj dirs, Program.cs and csproj file)
+Build a project:
+- dotnet build
+Run a project:
+- dotnet run
+
+To open UI:
+- right click UI project folder > 'set as startup project'
+
+For access to databases:
+- right click Dependencies, "Manage NuGet Packages", Browse, "Dapper", Install
+
+For App:
+- create new 

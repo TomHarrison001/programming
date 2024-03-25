@@ -1,0 +1,8 @@
+vs code: requires JDK, Red Hat Language Support for
+    Java extension and Debugger for Java extension
+
+create .java file
+build: javac filename.java
+run: java filename
+
+public class must have the same name as the file name

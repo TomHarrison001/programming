@@ -1,0 +1,149 @@
+https://learning.sap.com/learning-journey/learn-the-basics-of-sap-bi
+
+Learning the Basics of SAP BI
+
+Business Intelligence (BI) - interactive user-centered process including accessing, exploring, analysing information; producing insights and understanding that lead to improved and informed decision making
+Examples of BI:
+- Sales and finance reports
+- Executive level graphical dashboards
+- Predictive analysis
+
+SAP BusinessObjects BI Platform:
+- Identify and track key performance metrics against their direct competitors/overall market
+- Reduce strain on IT departments
+- Decrease query/reporting time
+- Improve customer service and target high yield accounts
+- Identify successful marketing campaigns
+- Streamline operations and improve supplier and warehouse operations
+- Improve response time to market trends and customer requests
+- Reduce cost and anxiety over compliance
+- Information delivery:
+	- Automated distribution of personalised BI content to mass audience
+	- Integrate with SAP Analytics SDK
+	- API for extending the solution or for process automation
+- Scalable and robust service:
+	- Ability to scale up and scale out
+	- Fault tolerance and load balancing
+- BI Content Management:
+	- Secured storage of BI content
+- Auditing:
+	- Audit trail for compliance or capacity planning
+- Tools:
+	- Central Management Console (CMC): main web interface; includes BI Administrators' Cockpit which allows an admin to collect basic data about the Business Objects BI system (high-level info about server, scheduled jobs, content usage and applications)
+		- Server Intelligence Agent (SIA): manages a collection of server processes or nodes (node - group of SAP BusinessObjects BIP server that run on the same host)
+	- Central Configuration Manager (CCM): server troubleshooting and node management tool (windows: manage servers through GUI/command line, Unix: CMM shell script - ccm.sh - allows you to manage servers from command line), Tomcat Web application server to start/stop your Web app server
+	- Promotion Management Wizard (PMW): transfers BI Platform objects across systems (LCM console is a web-based tool to manage BI resources, dependencies and version control)
+	- Central Management Server (CMS): stores info about servers in the CMS system database
+
+Data Discovery:
+- SAP Analytics Cloud (mashup data from multiple sources, create and combine visualistaions)
+Applications & Dashboards:
+- SAP Lumira Designer (Deliver information, customisable dashboards, planning and prediction)
+Office Integration:
+- SAP BusinessObjects Analysis, Edition for Microsoft Office (financial analysis, access, visualise and analyse data within MS Excel/PowerPoint)
+Reporting:
+- SAP Crystal Reports, SAP BusinessObjects Web Intelligence (securely distribute information, interactive reports, publish high volumes data)
+
+Analytical content:
+- Leverage actual/historical data, base decisions on solid information
+- Review account statements to control customer invoices and vendor accounts
+- Analyse goals and strategic Key Performance Indicators (KPIs)
+
+SAP Analysis Cloud (for Power User/IT, Business Analysts and Business Users):
+- Data Discovery:
+	- Automatically discover the main business drivers behind your core KPIs
+	- Create/modify versions of cloud planning models for budgeting, forecasting and analysis
+	- 360 view across all lines of business
+- Office Integration Tools:
+	- Access, slide and pivot cubes in SAP BW and SAP HANA
+	- Share with SAP Crystal Reports and SAP BusinessObjects Web Intelligence
+	- Use MS Excel and PowerPoint
+- Reporting Tools:
+  - SAP Crystal Reports: Windows-based report design tool
+	- SAP BusinessObjects Web Intelligence: provides quick answers to unpredictable questions
+
+Dashboards and Applications Development Tools - SAP Lumira:
+Note: For on-premise solutions, mainstream Priority 1 support will be available through 2027 (recommended to transition analytic application and data discovery use cases to SAP Analytics Cloud)
+SAP Lumira 1.x - end of mainstream maintenance 31 Aug 2018
+SAP Lumira Discovery - end of mainstream maintenance 31 Dec 2022
+
+SAP BusinessObjects BI Platform:
+- SAP Crystal Reports
+- SAP BusinessObjects Web Intelligence
+- SAP Analytics Cloud
+- SAP Lumira Designer
+- SAP BusinessObjects Analysis for MS Office
+
+Semantic layer:
+- Autonomous
+- Enable single user experience
+- Provice trust and consistency
+- Enable consumption by all applications and BI tools
+- Allow IT to keep control and ensure security
+
+SAP Business Warehouse (BW):
+- Identify slow moving goods and big sellers
+- Investigate the profitability of branches in different locations
+- Investigate the effectiveness of market analysis
+- Evaluate customer surveys and complaints
+- Analyse warehouse stock levels
+- Analyse shopping carts using cash register receipts
+
+SAP HANA combines databases, data processing and application platform capabilities in memory
+The platform provides libraries for predictive, planning, text processing, spatial and business analytics
+This architecture enables converged Online Transactional Processing (OLTP) and Online Analytical Processing (OLAP) data processing \
+within a single in-memory, column-based data store with ACID (atomicity, consistency, isolation, durability) compliance, while eliminating data redundancy and latency
+
+SAP BUSINESSOBJECTS UNIVERSE provides open/agnostic access to all corporate databases, data warehouses (including SAP BW) and applications
+A universe contains no data but points to a data source (e.g. a database, data warehouse, OLAP cube)
+Comprised of:
+- Connection: identifies data source and info for accessing that data source
+- Data Foundation: identifies what table contains the required data
+- Business Layer: identifies the specific columns within the tables
+
+BI launch pad - web based app for accessing report tools and to create a view finished BI documents
+
+Creating an Analytical Application with Tab Strip Layout and Filter Panel:
+- Data Preparation:
+- Lumira Designer Inital View: modify the initial state of any data source without changing the actual data source
+	- Measure (the accuracy of data displayed, scaling factors and the sorting order)
+	- Data (the dimensions of the table and background filter)
+	- Dimensions (additional attributes to be displayed)
+
+Creating a Basic Workbook with SAP Business Objects Analysis, Edition for Microsoft Office:
+- Data Sources: SAP BW Queries, Query Views, SAP NetWeaver BW InfoProviders, SAP HANA Views, SAP Analytics Cloud models
+
+SAP Crystal Reports:
+- Creation: Use a Report Wizard, construct manually or create from another report
+- Choose a data source from the Database Expert
+- View > Field Explorer
+- View > Preview Sample
+
+SAP Crystal Reports for Enterprise is a user-friendly version of the SAP Crystal Records designer
+
+Scheduling features of SAP BusinessObjects Web Intelligence Document:
+- Refreshes automatically creating an instance
+- Instances represent an element's history
+- Recurrence patterns:
+  - now, once, hourly, daily, weekly, business hours, monthly, calendar
+- Destinations:
+  - default enterprise location, BI inbox, email, FTP server, file system
+
+SAP Analytics Cloud:
+- One design environment
+- Rapid prototyping
+- Standardisation of analytics content
+- Built-in connectors to data sources
+- Algorithms for distributing data
+
+SAP Analytics Cloud Data Sources:
+- Live Data Connections (SAP Cloud Platform, SAP S/4HANA Cloud, SAP HANA, SAP BW, SAP S/4HANA, SAP BusinessObjects Universe, Local Files):
+	- Available for cloud and on-premise data sources
+	- Do not replicate data in SAP Analytics Cloud
+	- Use existing data models for analysis
+	- Update with data in real-time
+- Import Data Connections (Many Cloud Applications, OData, SAP BPC NetWeaver, SAP BPC for Microsoft, SAP BW, SAP ERP, SAP BusinessObjects Universe, SQL DB, Local Files):
+	- Available for cloud and on-premise data sources
+	- Replicate data in SAP Analytics Cloud
+	- Create new data models through SAP Analytics Cloud Modeler
+	- Update when refreshed

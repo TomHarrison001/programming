@@ -1,0 +1,322 @@
+Chef uses Ruby
+Only takes action when required to (skips unnecessary steps)
+
+Setting up a workstation:
+- Chef DK - https://downloads.chef.io
+- A text editor (Vim, Emacs or Nano)
+
+Configuration Management (CM):
+- Application of programmatic methods that create consistency in the performance, function, design and operation of compute resources
+- Applied over the life cycle of a system
+- Verification of performance through testing
+- Use of pre-configured code to acomplish common tasks
+
+CM tools: Puppet, Chef, RightScale, Ansible, Salt, CFEngine, DIY
+
+Check --version for [chef, chef-client, knife, ohai, berks, kitchen, foodcritic, cookstyle] using {tool} --version
+
+Vagrant - https://www.virtualbox.org/
+VirtualBox - https://www.vagrantup.com/downloads.html
+Use PuTTY or Git Bash for SSH clients
+
+vagrant ssh-config         # Displays connection details
+vagrant init               # Creates a Vagrant file
+vagrant status             # Lists VMs and their status
+vagrant suspend            # Saves VM state and shuts down
+vagrant destroy --force    # Destroys all running VMs
+
+vboxmanage --version
+vagrant --version
+vagrant box add bento/centos-7.2 --provider=virtualbox
+vagrant init bento/centos-7.2
+vagrant up
+vagrant status
+vagrant ssh default
+curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -P chefdk -c stable -v 0.18.30
+sudo yum install vim
+pwd
+/home/vagrant
+vim hello.rb
+i - insert
+file '/hello.txt' do
+  content 'Hello world.'
+end
+ls
+hello.rb
+sudo chef-client --local-mode hello.rb
+cat /hello.txt
+
+# permissions
+ls -la /hello.txt
+sudo chown vagrant /hello.txt
+ls -la /hello.txt
+vim hello.rb
+file '/hello.txt' do
+  content 'Hello world.'
+  mode 0644
+  owner 'root'
+  group 'root'
+end
+# this changes the owner from vagrant back to root
+ls -la /hello.txt
+
+mkdir cookbooks
+chef generate --help
+chef generate cookbook --help
+chef generate cookbook cookbooks/apache
+sudo yum install tree
+tree
+tree cookbooks/apache
+ls -a cookbooks/apache/
+
+chef generate recipe --help
+chef generate recipe cookbooks/apache/ server
+tree cookbooks/apache/
+vim cookbooks/apache/recipes/server.rb
+package 'httpd'
+
+file '/var/www/html/index.html' do
+  content '<h1>Hello, world!</h1>'
+end
+
+service 'httpd' do
+  action [:start, :enable]
+end
+
+:wq - save + exit
+sudo chef-client --local-mode cookbooks/apache/recipes/server.rb
+curl localhost
+
+tree
+sudo chef-client --local-mode --runlist "recipe[apache::server]"
+sudo chef-client -zr "recipe[apache::server]"
+cat cookbooks/apache/recipes/default.rb
+sudo chef-client -zr "recipe[apache::default]"  # Runs default recipe
+sudo chef-client -zr "recipe[apache]"  # Also runs default recipe
+vim cookbooks/apache/recipes/default.rb
+...
+include_recipe 'apache::server'
+:wq
+sudo chef-client -zr "recipe[apache]"  # Runs default (which also runs server.rb)
+
+# Ohai 
+hostname
+hostname -I
+cat /proc/meminfo
+ohai
+ohai ipaddress
+ohai hostname
+ohai memory
+# Update server.rb to this:
+package 'httpd'
+
+file '/var/www/html/index.html' do
+  content "<h1>Hello, world!</h1>
+  ipaddress: #{node['ipaddress']}
+  hostname: #{node['hostname']}
+"
+end
+
+service 'httpd' do
+  action [:start, :enable]
+end
+:wq
+sudo chef-client -zr "recipe[apache]"
+curl localhost
+
+# Ruby
+count = 3
+puts "Count: #{count}"
+
+# ERB
+<% if (50 + 50) == 100%>
+50 + 50 = <%= 50 + 50 %>
+<% else %>
+Woah, it's not 100
+<% end %>
+
+# Templates
+chef generate template cookbooks/apache index.html
+vim index.html
+<h1>Hello, world!</h1>
+<h2>ipaddress: <%= node['ipaddress'] %></h2>
+<h2>hostname:  <%= node['hostname'] %></h2>
+:wp
+vim server.rb
+package 'httpd'
+
+template '/var/www/html/index.html' do
+  source 'index.html.erb'
+end
+
+service 'httpd' do
+  action [:start, :enable]
+end
+
+:wq
+sudo chef-client -zr "recipe[apache]"
+curl localhost
+
+# Set up Webserver
+Provide the instance
+Install Chef
+Copy the web server cookbook
+Apply the cookbook
+
+# Set up Load Balancer
+Create the haproxy (load balancer) cookbook
+Provision the instance
+Install Chef
+Copy the haproxy cookbook
+Apply the cookbook
+
+# Create account for hosted Chef
+https://manage.chef.io/signup
+Download the starter kit
+Unzip chef-repo and move to available directory (e.g. desktop)
+mv ~/Desktop/chef-repo ~/
+ls
+Vagrantfile
+cd ~
+ls
+Applications chef-repo Documents Desktop Downloads etc.
+cd chef-repo/
+# Knife - CLI tool between a local chef-repo and the Chef Server
+knife --help
+knife client list
+# should return organisation validator
+ls cookbooks/
+knife cookbook -help
+pwd
+/users/tomha/chef-repo
+knife cookbook upload apache
+knife cookbook list
+# should show apache
+
+# Create a centos instsance on a cloud provider (AWS, Azure, etc.)
+# Copy the public IP of the instance
+knife node -help
+knife node list
+Body Level One
+FQDN - Fully qualified domain name / public IP, USER - username, PWD - password, NODE - node name, RUN_LIST - e.g. "recipe[apache]"
+knife bootstrap FQDN -x USER -P PWD --sudo -N NODE -r RUN_LIST
+knife node list
+NODE
+knife node show NODE
+
+# Test cookbooks using Kitchen
+# Requires VM using Vagrant and VirtualBox
+vim ~/chef-repo/cookbooks/apache/.kitchem.yml
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: ubuntu-16.04
+  - name: centos-7.2
+
+suites:
+  - name: default
+    run_list:
+      - recipe[apache::default]
+    verifier:
+      inspec_tests:
+        - test/recipes
+    attributes:
+:wp
+cd cookbooks/apache
+kitchen list
+kitchen create
+kitchen converge
+which httpd
+/usr/sbin/httpd
+curl localhost
+<html>
+...
+</html>
+tree
+vim test/recipes/default_test.rb
+describe port(80) do
+  it { should be_listening }
+end
+
+describe command('curl localhost') do
+  its(:stdout) { should match(/Hello, world!/) }
+end
+:wq
+kitchen verify  # executes all tests in test/
+# DONT FORGET TO DESTROY KITCHEN WHEN FINISHED TESTING
+kitchen destroy
+
+Chef WebUI:
+manage.chef.io
+
+Community Cookbooks
+https://supermarket.chef.io
+haproxy
+# Generate a new cookbook
+chef generate cookbook cookbooks/myhaproxy
+vim ~/chef-repo/cookbooks/myhaproxy/metadata.rb
+...
+version '0.1.0'
+
+depends 'haproxy', '= 1.6.7'
+
+# If you upload...
+...
+:wq
+vim ~/chef-repo/cookbooks/myhaproxy/recipes/default.rb
+#
+# Cookbook Name:: myhaproxy
+# Recipe:: default
+#
+# Copyright (c) 2023 The Authors, All Rights Reserved.
+
+node.default['haproxy']['members'] = [
+{
+    'hostname' => 'web1_PUBLIC_HOSTNAME',
+    'ipaddress' => 'web1_PUBLIC_IPADDRESS',
+    'port' => 80,
+    'ssl_port' => 80
+  }, {
+    'hostname' => 'web2_PUBLIC_HOSTNAME',
+    'ipaddress' => 'web2_PUBLIC_IPADDRESS',
+    'port' => 80,
+    'ssl_port' => 80
+}]
+
+include_recipe 'haproxy::default'
+:wq
+knife node show NODE -a cloud
+
+cd ~/chef-repo/cookbooks/myhaproxy
+cat ~/chef-repo/cookbooks/myhaproxy/Berksfile
+source 'https://supermarket.chef.io'
+
+metadata
+berks install
+ls ~/.berkshelf/cookbooks/
+berks upload
+knife cookbook list
+knife node list
+knife bootstrap FQDN -x USER -P PWD --sudo -N NODE -r "recipe[myhaproxy]"
+# paste FQDN to browser for results (make sure open to public http requests)
+
+
+# Defining a production environment
+vim ~/chef-repo/environments/production.rb
+name 'production'
+description 'Where we run production code'
+
+cookbook 'apache', '= 0.1.0'
+cookbook 'myhaproxy', '= 0.1.0'
+:wq
+
+# Bootstrapping with a role
+knife bootstrap FQDN -x USER -P PWD --sudo -N NODE -r "role[web]" -E production

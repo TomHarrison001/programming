@@ -1,0 +1,6 @@
+React Native Tools VS Code plugin
+
+npx create-expo-app projectName
+
+open:
+npx expo start

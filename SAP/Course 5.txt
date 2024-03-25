@@ -1,0 +1,230 @@
+https://learning.sap.com/learning-journey/design-data-models-and-transform-data-in-sap-analytics-cloud
+
+Designing Data Models and Transforming Data in SAP Analytics Cloud
+
+Analytic models are read-only and don't have any required dimensions or measures
+Planning models are read-write and require Version and Date dimensions (SAP BPC can work with real-time (non-imported) data, but any other planning model must replicate the data into SAP Analytics Cloud)
+
+Analytic and Planning models can be Account-Based or Measure-Based:
+- Account-Based: 1 measure
+- Measure-Based: New model with accounts or New model without accounts (1+ measures)
+
+Connection Types:
+- Live:
+  - data transformations and model-based calculations aren't supported, however creating calculations in a story is possible
+- Import
+
+Datasets:
+- Ad-hoc/Smart predict
+- Standalone or Embedded
+- 1 data table
+Live Models:
+- Planning
+- Standalone
+- Dimensions and data table
+Import Models:
+- Planning and Analysis
+- Scheduled imports available
+- Standalone
+- Dimensions and data table
+- Calculated measures
+- Data Security in SAP Analytics Cloud
+
+Dimensions - represent qualitative data
+Measures - represent quantitative data
+
+Public Dimensions:
+- Standalone
+- Remain intact if the model is deleted because it's not dependent on the model
+Private Dimensions:
+- Embedded (model-specific)
+- Deleted with the model, can't be shared among other models
+
+Dimension Types:
+- Organisation:
+  - Properties: Currency and Person Responsible are system-generated, and more can be added
+  - Hierarchies: as many as needed
+  - Optional in a model
+  - Only one per model
+- Account:
+  - Properties: There are several system-generated properties (Formula, Account Type, Calculated On, Aggregation Type, Exception Aggregation, Scale, Decimal Places, Units and Currencies, Hide), and more can be added
+  - Hierarchies: The default hierarchy is system generated (classic/new model), and more can be added on the new model only
+  - Mandatory in a classic account model but optional in the new model type
+  - Only one per model
+- Version:
+  - Properties: added as needed (Category is sytem-generated)
+  - Hierarchies: n/a
+  - Mandatory (system-generated) in all planning models; not applicable for analytic models
+  - Only one per model
+- Date:
+  - Properties: system-generated only (classic model) / added as needed but only when user-managed (new model)
+  - Hierarchies: system-generated only based on calendar time but can be changed to fiscal time (classic model) / added as needed but only when user-managed (new model)
+  - Mandatory (system-generated) in all planning models; optional for analytic models
+  - More than one allowed per model, helpful if you need to compare dates for different scenarios, such as Order vs. Shipping date
+- Generic:
+  - Properties: added as needed
+  - Hierarchies: as many as needed
+  - Optional in a model
+  - More than one allowed per model
+
+The hierarchy column in a dimension is used to store the parent-child values (+ Add Hierarchy - on the toolbar)
+The hierarchy is visualised in the Preview panel in the dimension
+Dimension types that allow more than one hierarchy can have either one or more level-based hierarchies or one or more parent-child hierarchies but not a combination of both
+
+Master data can be imported from SAP source systems or files, including the member IDs, descriptions, hierarchies and properties
+Data can also be imported from non-SAP systems
+Sometimes you may need to change the master data before importing it into your dimensions (in the data wrangling area)
+
+Import Transaction Data:
+Master data is usually imported before transaction data
+Transaction data is stored in the model's fact table
+One key difference in the importing of transaction data to master data is the Set Up Import activity
+Set Up Import:
+- Prepare the data
+- Map the source to the target
+- Map properties
+- Review the import
+
+Import Master Data and Transaction Data:
+- SAP Source System:
+  - Go to Data Management > Import Data > Data Source
+  - Select Source System and Connection
+  - Choose the Source System source
+  - Select the fields to be imported and add filters
+  - Wrangle the data
+  - Map the source columns to the dimension columns
+  - Run the import and read the log
+- File Data Source:
+  - Go to Data Management > Import Data > File
+  - Select the source file
+  - Wrangle the data
+  - Map the file columns to the dimension columns
+  - Run the import and read the log
+
+Smart Transformations:
+- Trim Whitespace
+- Duplicate Column
+- Concatenate
+- Split
+- Change: to upper, to lower, capitalise
+
+Custom Expression Editor
+e.g. [WK] = if([Week] < 10, concatenate(0, [Week], ""), [Week])
+
+Job Settings:
+- Import method
+- Reverse sign by account type
+- Update local dimensions with new members
+- Conditional validation
+
+A Completed Analytic Model:
+- Model structure workspace: where you can view the meta data
+- Measures: where the measure values are stored in the model
+- Public dimensions: represented by a globe
+
+Model Preferences (set by default and rarely changed except to specify an Analytic rather than a Planning model):
+- General Settings: Select the model type, either Planning or not (Analytic)
+- Language: Request language translation
+- Access and Privacy: Set data access and other controls
+- Date Settings: Enable weekly based if needed and set the date to calendar year or fiscal year
+- Planning: Set disaggregation behaviour for planning models
+- Currency: Enable currency conversion
+- Structure Priority: Set the tie breaker for data intersections for account and measure formulas
+- Data and Performance: Configure settings to optimise performance for analytics and planning
+
+Structure View:
+- shows you a star schema diagram representing the contents of your model
+Data Foundation View:
+- shows the fact table containing the raw, non-aggregated transactional data loaded into your model
+
+Data Management workspace:
+- Edit allows you to change the filter values in the import query
+- Schedule is where you can set up the import query to run periodically
+- Select import method is used to change the import method
+- Refresh is used to run the import again
+
+Update Methods:
+- Update: Updates existing data and adds new entries (scope: combination of all dimensions)
+- Append: Leaves existing data and adds only new entries (1. reject duplicated records; 2. aggregate duplicated rows (e.g. adds new value to previous))
+- Clean and replace selected version data: Deletes existing data and adds new entries only for the versions that you specify
+- Clean and replace subset of data: Replaces existing data and adds new entries for a defined subset of the data using either Existing Version or New Version buttons
+
+Dimension Member Formulae:
+- available in any story that uses a model containing the account dimension with a formula and can be viewed by displaying the formula bar
+Calculated Measures:
+- similar to dimension member formulae but are created in the Calculations workspace for measure-based models
+To create a calculated measure:
+- Go to the Calculations workspace
+- Add the Calculated Measure
+- Create the Formula
+- Preview the results
+Calculated Measure Exception Aggregation Settings:
+- allow you to incorporate dimensions in the calculated values (e.g. if you have a model with Store and Product Line dimensions and a Revenue measure, you can create a measure that counts the number of product lines)
+
+Exchange rates are stored in the SAP Analytics Cloud Currency Translation table
+Local Currency (LC) - functional or operating currency for a company
+Group Currency - corporate level currency
+Translation - used interchangably with conversion
+
+Enable currency conversion (Model Preferences: Currency):
+- Model Preferences > Activate Currency conversion
+- Select source currency table and Date Dimension
+- Activate currency variable (optional) by selecting Create Currency variable
+Enable currency conversion (Dimension Settings: Currency):
+- Enable Currency toggle
+- Change the name of the currency property
+- LC is the local currency
+Enable currency conversion (Account Dimension Settings: Currency):
+- Set the Rate Type (new column added when conversion enabled in model preferences) to Average for INC and EXP account and to Closing for AST and LEQ account
+
+Weekly Time Patterns: 4-4-5, 4-5-4, 5-4-4, 13x4
+
+You can access the data from a live connection without creating a model by using the Data Analyzer
+Data Analyzer is a predefined, ready-to-run service for SAP Business Warehouse (SAP BW) queries, SAP HANA Live views, SAP Datasphere models and SAP Analytics Cloud models for ad-hoc analysis
+All SAP BW queries, SAP HANA Live views and models can be accessed directly in the Select Data Source
+
+SAP S/4HANA Integration:
+- As a live data connection or an import data connection
+- You can create live models to SAP S/4HANA Core Data Services Views or queries
+
+SAP HANA Integration:
+- As a live data connection (for SAP HANA and SAP HANA Cloud)
+- As an import connection (for SAP HANA)
+- You can create live models using HANA Calculation Views as a data source
+  - Declare a Time Dimension for automatic time determination features in stories
+  - In the Measures tab, the aggregation settings can be adjusted in the live model
+  - In the Dimension tab, dimensions can be renamed, grouped or hidden
+
+SAP BW Integration:
+- As a live data connection (for SAP BW and SAP BW/4HANA)
+- As an import connection (for SAP BW and SAP BW/4HANA)
+- You can create live data models to SAP BW Queries
+
+Supported SAP BW Query Elements in Live Models:
+- Time-dependent hierarchies
+- BW Variables
+- BW Variants and Personalisation
+- BW Structures
+- Parallel processing of BW queries
+
+SAP BusinessObjects Integration:
+- As a live data connection (for SAP BusinessObjects Universes and Web Intelligence)
+- As an import data connection (for SAP BusinessObjects Universes)
+- Live models can connect to a SAP BusinessObjects Universe and to Web Intelligence documents
+
+Prerequisites for Geo Enriching Data:
+- an XLSX or CSV with a location ID column containing unique data and latitude and longitude columns
+Ways to Geo Enrich Data:
+- By coordinates
+- By area name
+Points of interest are sets of geographical data that you can add to a geo map
+You can add points of interest from an Esri shapefile, Excel or a CSV file or from a SAP HANA model with a geographical dimension
+
+Security in SAP Analytics Cloud is used to control access to both objects and data
+Roles are used as well as the following basic permissions:
+- Create, Read, Update, Delete, Execute, Maintain, Share, Manage
+Roles aren't typically assigned directly to users but to teams
+
+Secure Data from the Model Preferences:
+- Model Data Privacy: determines whether the model is visible to users other than the owner
+- Data Access Control in Dimensions: you can specify the data access in the dimension's setting
