@@ -1,2 +1,30 @@
 # programming
-A collection of all the notes for each language I have learnt
+## A collection of all the notes for each language and framework I have learnt
+- Angular
+- Ansible
+- AWS
+- Azure
+- C
+- C#
+- C++
+- Cassandra
+- Chef
+- Databases
+- Django
+- Elasticsearch
+- Flask
+- Frontend
+- Java
+- Jenkins
+- jQuery
+- Kafka
+- MongoDB
+- MySQL
+- Neo4j
+- NGINX
+- PostgreSQL
+- Python
+- RabbitMQ
+- React Native
+- SAP
+- VMware
