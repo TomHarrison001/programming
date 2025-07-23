@@ -1,8 +1,22 @@
-vs code: requires JDK, Red Hat Language Support for
-    Java extension and Debugger for Java extension
+Java / vs code:
+- requires JDK, Red Hat Language Support for Java extension and Debugger for Java extension
 
-create .java file
+1. create .java file
 build: javac filename.java
 run: java filename
 
 public class must have the same name as the file name
+
+Java / Eclipse:
+
+new project: File > New > Java Project
+new package: src (right-click) > New > Package > "com.tom.learn.java"
+new class: com.tom.learn.java (right-click) > New > Class > "HelloWorld" > create public static void main(String[] args)
+run: HelloWorld.java (right-click) > Run As > Java Application
+
+package classes: package com.orgName.appName.compName;
+import classes: import className --or-- import com.tom.* for all com.tom. packages
+
+testing: .java (right-click) > New > JUnit Test Case
+
+use Loggers instead of System.out.println()
