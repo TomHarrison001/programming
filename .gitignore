@@ -396,3 +396,12 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Expo
+.expo/
+
+# VS Code
+.vscode/
+
+# test output
+.cache
