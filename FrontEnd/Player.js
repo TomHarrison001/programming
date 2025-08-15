@@ -9,3 +9,8 @@ class Player {
 }
 
 export default Player;
+
+// import Player from "./Player.js";
+
+// const p1 = new Player("Rock", 20);
+// p1.take_damage(5);

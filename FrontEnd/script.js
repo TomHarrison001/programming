@@ -1,123 +1,103 @@
-const divs = document.getElementsByTagName("div");
-divs[0].textContent = "New text";
-
-const newDiv = document.createElement("div");
-newDiv.textContent = "New div";
-document.body.append(newDiv);
-
-let a;
-a = 5;
-if (a !== 5) {
-  console.log(a);
+// function declaration
+function sayHello() {
+  console.log("Hello, World!");
 }
 
-const b = true;
-const c = "hello";
-const d = 2.6;
-
-const createElementWithContent = (text, tag = "div") => {
-  const element = document.createElement(tag);
-  element.textContent = text;
-  return element;
+// function expression
+const add = function (a, b) {
+  console.log(a + b);
 };
 
-const newElement = createElementWithContent("New function");
-document.body.append(newElement);
+sayHello();
+add(5, 10);
+add("Hello", "world.");
 
-const double = (value) => {
-  return value * 2;
+(function immediatelyInvokedFunction() {
+  console.log("This function runs immediately!");
+})();
+
+// arrow function
+const square = (x) => {
+  console.log(x * x);
 };
 
-console.log(double(2));
+square(5);
 
-const languages = ["HTML", "CSS"];
-console.log("Length:", languages.length);
-console.log(languages[0]);
-languages.push("JS");
-console.log(languages);
-languages.forEach((item, index) => {
-  console.log(`${index + 1}: learn ${item.toLowerCase()}`);
+// anonymous function
+const multiply = (a, b) => a * b;
+
+console.log(multiply(5, 10));
+
+function Car(make, model, year) {
+  this.make = make;
+  this.model = model;
+  this.year = year;
+  this.getName = function () {
+    return this.make + " " + this.model + " " + this.year;
+  };
+}
+
+Car.prototype.getAge = function () {
+  return new Date().getFullYear() - this.year;
+};
+
+var c = new Car("Mclaren", "720S", 2018);
+alert(c.getName());
+
+const obj1 = { p1: 0, p2: "text" };
+const obj2 = { p2: "overwritten", p3: true, __proto__: obj1 };
+
+const array = [];
+let len = array.length;
+array.push(1);
+array.pop();
+
+const sendWelcomeEmail = (email) => {
+  console.log(`Sending welcome email to ${email}`);
+};
+const users = [
+  { name: "Alice", email: "alice@example.com" },
+  { name: "Bob", email: "bob@example.com" },
+  { name: "Charlie", email: "charlie@example.com" },
+];
+users.forEach((user) => {
+  sendWelcomeEmail(user.email);
 });
-console.log(
-  "Found item:",
-  languages.find((item) => item === "HTML")
-);
-
-const obj1 = { p1: "Hello world.", p2: 1000 };
-const obj2 = { p2: "Overwritten value.", p3: true, __proto__: obj1 };
-
-for (const obj of [obj1, obj2]) {
-  console.log(`p1: ${obj.p1}, p2: ${obj.p2}, p3: ${obj.p3}`);
+const mappedUsers = users.map((user) => {
+  console.log(`User: ${user.name}, Email: ${user.email}`);
+});
+function filterEmailsByLetter(users, letter) {
+  return users.filter((user) => user.email.startsWith(letter));
 }
+const filteredEmails = filterEmailsByLetter(users, "a");
+filteredEmails.forEach((user) => {
+  console.log(`Filtered User: ${user.name}, Email: ${user.email}`);
+});
+const user = users.find((user) => user.name === "Alice");
+const testResults = [90, 80, 85, 70];
+const average =
+  testResults.reduce((acc, score) => acc + score, 0) / testResults.length;
+console.log(`Average Test Score: ${average}`);
+
+const div = document.getElementById("id");
+div.textContent = "New text";
+document.getElementsByTagName("tagName");
+document.createElement("elementName");
+parentNode.appendChild(childNode);
+element.innerHTML;
+element.style;
+// element.style.propertyName = value;
+// window.open(url, name, [features, replace]);
+window.onload;
+window.dump("message");
+let x = 0;
+let y = 0;
+window.scrollTo(x, y);
 
 const ctx = myCanvas.getContext("2d");
 ctx.fillRect(20, 20, 60, 60);
-ctx.fillRect(100, 0, 100, 100);
-ctx.fillStyle = "lightblue";
-ctx.fillRect(120, 20, 60, 60);
 
-import Player from "./Player.js";
-
-const p1 = new Player("Rock", 20);
-p1.take_damage(5);
-
-console.log(`${p1.username}: ${p1.health}`);
-
-const newArticle = document.createElement("article");
-newArticle.classList.add("player");
-newArticle.setAttribute("username", p1.username);
-
-let content = `
-  <main>
-    <article>
-      <h1>${p1.username}</h1>
-      <ul>
-        <li>Health: ${p1.health}</li>
-      </ul>
-    </article>
-  </main>
-`;
-
-newArticle.innerHTML = content;
-document.body.append(newArticle);
-
-document
-  .querySelectorAll("div")
-  .forEach((item) => (item.style.background = "orange"));
-
-let x = 5,
-  y = 5;
-
-console.log(x == y ? "True" : "False");
-
-content = `
-<article class="container">
-  <button class="button">Click Me</button>
-</article>
-`;
-
-document.body.innerHTML = content;
-
-const container = document.querySelector(".container");
-container.style.backgroundColor = "orange";
-const button = document.querySelector(".button");
-
+const button = document.getElementById("button");
 button.addEventListener("click", () => {
   console.log("Clicked!");
 });
-
-container.addEventListener(
-  "mouseenter",
-  () => {
-    container.style.backgroundColor = "blue";
-  },
-  false
-);
-
-container.addEventListener(
-  "mouseleave",
-  () => {
-    container.style.backgroundColor = "orange";
-  },
-  false
-);
